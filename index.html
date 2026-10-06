@@ -1,0 +1,1907 @@
+<!doctype html>
+<html lang="mr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+</head>
+<body style="margin:0">
+<title>ABHYNEX Digital Universe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Doto:wght@400;700;900&family=Mukta:wght@300;400;600&family=Unbounded:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+/* Layout: one fixed brand background (particles + rotating logo watermark) behind a stack of themed scenes.
+   Every scene sets its own --a/--b/--c palette; the field, nav, progress bar and glows all follow the active scene.
+   Boldness lives in the logo opening, the particle field and the chrome wordmark; the rest stays quiet glass. */
+@property --ga{syntax:"<color>";inherits:true;initial-value:#62d8ff}
+@property --gb{syntax:"<color>";inherits:true;initial-value:#8c6cff}
+:root{
+  color-scheme:dark;
+  --bg:#05060d;
+  --ink:#e8ebf6;
+  --mute:#a3abc4;
+  --cyan:#62d8ff;
+  --mag:#ff4fa3;
+  --vio:#8c6cff;
+  --amb:#ffb347;
+  --glass:rgba(14,16,34,.5);
+  --glass-hi:rgba(26,30,60,.62);
+  --line:rgba(160,175,255,.2);
+  --a:#62d8ff;--b:#8c6cff;--c:#ff4fa3;
+  --ga:#62d8ff;--gb:#8c6cff;
+  --brand:"Unbounded","Segoe UI",system-ui,sans-serif;
+  --display:"Doto","Courier New",ui-monospace,monospace;
+  --body:"Mukta","Noto Sans Devanagari",system-ui,-apple-system,"Segoe UI",sans-serif;
+  transition:--ga 1s ease,--gb 1s ease;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);
+  font-size:1.0625rem;line-height:1.6;overflow-x:hidden;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(60vmax 40vmax at 78% 18%,color-mix(in srgb,var(--ga) 20%,transparent),transparent 60%),
+    radial-gradient(50vmax 40vmax at 12% 85%,color-mix(in srgb,var(--gb) 16%,transparent),transparent 60%);
+  animation:bgzoom 5s cubic-bezier(.16,.7,.2,1) var(--d0,0s) both;
+}
+body::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(120% 90% at 50% 45%,transparent 55%,rgba(2,3,8,.75) 100%)}
+@keyframes bgzoom{from{transform:scale(2.6);opacity:.2}to{transform:scale(1);opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{50%{opacity:.35;transform:scale(.7)}}
+#gl{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;display:block}
+a{color:inherit}
+img,svg{max-width:100%}
+:focus-visible{outline:2px solid var(--ga);outline-offset:3px;border-radius:6px}
+.prog{position:fixed;z-index:11;top:0;left:0;right:0;height:2px;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,var(--ga),var(--gb),var(--mag))}
+
+/* brand background: a huge, faint, slowly turning logo */
+.wm-bg{position:fixed;z-index:0;left:50%;top:50%;width:min(120vmin,100rem);aspect-ratio:1;margin:calc(min(120vmin,100rem)/-2) 0 0 calc(min(120vmin,100rem)/-2);opacity:.07;pointer-events:none;animation:spin 300s linear infinite}
+.wm-bg svg,.logo{width:100%;height:100%;display:block}
+
+/* logo parts */
+.lr{transform-box:view-box;transform-origin:100px 100px}
+.lr1{animation:spin 18s linear infinite}
+.lr2{animation:spin 26s linear infinite reverse}
+.lr3{animation:spin 9s linear infinite}
+
+/* nav */
+.nav{
+  position:fixed;z-index:10;top:0;right:0;left:0;
+  padding:calc(env(safe-area-inset-top,0px) + 12px) max(16px,3vw) 0;
+  display:flex;justify-content:space-between;align-items:center;gap:12px;pointer-events:none;
+}
+.brand{pointer-events:auto;display:flex;align-items:center;gap:10px;font-family:var(--brand);font-weight:500;font-size:.95rem;letter-spacing:.22em;text-decoration:none;flex:none}
+.mark{width:34px;height:34px;display:block}
+.pill{
+  pointer-events:auto;min-width:0;max-width:100%;overflow-x:auto;scrollbar-width:none;
+  display:flex;gap:2px;padding:5px;border-radius:999px;
+  background:var(--glass);border:1px solid var(--line);
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+}
+.pill::-webkit-scrollbar{display:none}
+.pill a{flex:none;padding:6px 13px;border-radius:999px;text-decoration:none;font-size:.88rem;color:var(--mute);white-space:nowrap;transition:color .2s,background .2s}
+.pill a:hover,.pill a.on{color:var(--ink);background:color-mix(in srgb,var(--ga) 30%,transparent)}
+
+/* scenes: every scene carries its own theme */
+main{position:relative;z-index:1}
+.wrap{padding-inline:max(16px,5vw);max-width:84rem;margin-inline:auto}
+.scene{position:relative;padding-block:clamp(5.5rem,16vh,9rem) clamp(3rem,9vh,6rem);min-height:80svh;display:flex;flex-direction:column;justify-content:center}
+.scene::before{
+  content:"";position:absolute;top:0;bottom:0;left:50%;width:100vw;transform:translateX(-50%);z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(70% 55% at 88% 18%,color-mix(in srgb,var(--a) 17%,transparent),transparent 70%),
+    radial-gradient(60% 50% at 8% 92%,color-mix(in srgb,var(--b) 13%,transparent),transparent 70%),
+    linear-gradient(180deg,transparent,color-mix(in srgb,var(--c) 5%,transparent),transparent);
+}
+.scene::after{content:"";position:absolute;left:5%;right:5%;bottom:0;height:1px;background:linear-gradient(90deg,transparent,var(--a),transparent);opacity:.35}
+.th-home{--a:#62d8ff;--b:#8c6cff;--c:#ff4fa3}
+.th-ai{--a:#8c6cff;--b:#62d8ff;--c:#f6d89a}
+.th-live{--a:#ff5a6a;--b:#ffb347;--c:#ff4fa3}
+.th-farm{--a:#46e38a;--b:#c6ff5a;--c:#ffd45a}
+.th-books{--a:#e0a93f;--b:#ff6fa0;--c:#5b8cff}
+.th-author{--a:#2ee6c5;--b:#62d8ff;--c:#ffd27a}
+.th-skills{--a:#ffb347;--b:#ff7a3d;--c:#ff4fa3}
+.th-education{--a:#62b4ff;--b:#6c7bff;--c:#7dffd1}
+.th-journey{--a:#b79cff;--b:#ff4fa3;--c:#ffb347}
+.th-about{--a:#f6d89a;--b:#62d8ff;--c:#ff4fa3}
+.th-contact{--a:#ff4fa3;--b:#8c6cff;--c:#62d8ff}
+
+.col{max-width:34rem;min-width:0}
+.col.lg{max-width:40rem}
+.right .col{margin-left:auto}
+.mid .col{margin-inline:auto;text-align:center}
+.mid .col .lede{margin-inline:auto}
+h1,h2{margin:0;text-wrap:balance}
+h2{font-family:var(--brand);font-weight:500;font-size:clamp(1.8rem,4.4vw,3.2rem);line-height:1.12;letter-spacing:-.01em;margin-bottom:1.1rem;
+  background:linear-gradient(120deg,#fff 35%,var(--a));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;overflow-wrap:anywhere}
+h3{margin:0 0 .35rem;font-size:1.3rem;font-weight:600;line-height:1.25}
+p{margin:0 0 1rem}
+.lede{color:var(--mute);font-size:1.12rem;max-width:32rem}
+.label{font-family:var(--display);font-weight:700;letter-spacing:.14em;color:var(--a);font-size:1rem;margin-bottom:.9rem}
+.strap{font-family:var(--display);font-weight:700;letter-spacing:.12em;color:var(--mute);font-size:1rem;margin-top:2rem;overflow-wrap:anywhere}
+.row{display:flex;flex-wrap:wrap;gap:12px}
+.mid .row{justify-content:center}
+.btn{
+  display:inline-block;padding:11px 22px;border-radius:999px;text-decoration:none;font-weight:600;
+  border:1px solid var(--line);background:var(--glass);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  transition:background .2s,border-color .2s,filter .2s;
+}
+.btn:hover{background:var(--glass-hi);border-color:var(--a)}
+.btn.go{background:linear-gradient(120deg,var(--a),var(--b));border-color:transparent;color:#071016}
+.btn.go:hover{filter:brightness(1.12)}
+
+/* hero: the wordmark */
+.hero{min-height:100svh;justify-content:flex-end;padding-bottom:clamp(3rem,10vh,6rem)}
+.hero .col{max-width:none}
+.who{font-family:var(--display);font-weight:700;letter-spacing:.14em;color:var(--b);font-size:clamp(1rem,2.2vw,1.3rem);overflow-wrap:anywhere}
+.wordmark{
+  font-family:var(--brand);font-weight:500;font-size:clamp(2.4rem,12vw,9rem);line-height:1;letter-spacing:.02em;margin:.5rem 0 0;
+  background:linear-gradient(100deg,#ffffff 0%,#d9ecff 30%,#62d8ff 52%,#9b86ff 74%,#ff7ac0 100%);
+  background-size:220% 100%;background-position:0% 50%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;
+  animation:titlein 2.2s cubic-bezier(.16,.8,.2,1) calc(var(--d0,0s) + .3s) both,sheen 9s ease-in-out calc(var(--d0,0s) + 3s) infinite alternate;
+  max-width:100%;overflow-wrap:anywhere;
+}
+.lockup{display:flex;align-items:center;gap:14px;margin:1.3rem 0 1.5rem;font-family:var(--display);font-weight:700;font-size:clamp(1.05rem,2.4vw,1.6rem);letter-spacing:.22em;color:var(--a)}
+.lockup::after{content:"";height:1px;width:min(16rem,28vw);background:linear-gradient(90deg,var(--a),transparent)}
+.pts{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:12px;margin-top:2rem;max-width:44rem}
+.pt{padding:.75rem 1rem;border-radius:16px;background:var(--glass);border:1px solid var(--line);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.pt b{display:block;font-family:var(--display);letter-spacing:.12em;color:var(--a)}
+.pt span{color:var(--mute);font-size:.95rem}
+@keyframes titlein{from{opacity:0;filter:blur(18px) drop-shadow(0 0 0 rgba(98,216,255,0));letter-spacing:.4em}to{opacity:1;filter:blur(0) drop-shadow(0 0 30px rgba(98,216,255,.28));letter-spacing:.02em}}
+@keyframes sheen{to{background-position:100% 50%}}
+@keyframes fadeup{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.a1{animation:fadeup 1.2s ease calc(var(--d0,0s) + .2s) both}
+.a2{animation:fadeup 1.2s ease calc(var(--d0,0s) + 1.4s) both}
+.a3{animation:fadeup 1.2s ease calc(var(--d0,0s) + 1.7s) both}
+.a4{animation:fadeup 1.2s ease calc(var(--d0,0s) + 2s) both}
+.cue{position:absolute;right:max(16px,5vw);bottom:clamp(3rem,10vh,6rem);display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--mute);font-size:.8rem;text-decoration:none;animation:fadeup 1.2s ease calc(var(--d0,0s) + 2.4s) both}
+.cue span{display:block;width:1px;height:56px;background:linear-gradient(var(--a),transparent);animation:cue 2s ease-in-out infinite}
+@keyframes cue{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* glass cards */
+.cards{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr));margin-top:2rem;text-align:left}
+.glass{
+  position:relative;padding:1.4rem;border-radius:22px;min-width:0;
+  background:linear-gradient(160deg,var(--glass-hi),var(--glass));
+  border:1px solid var(--line);
+  -webkit-backdrop-filter:blur(18px) saturate(140%);backdrop-filter:blur(18px) saturate(140%);
+  box-shadow:0 30px 60px -30px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.07);
+  transform:perspective(900px) rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg));
+  transition:transform .25s ease-out,border-color .25s;
+  display:flex;flex-direction:column;gap:.5rem;
+}
+.glass:hover{border-color:color-mix(in srgb,var(--a) 60%,transparent)}
+.glass p{color:var(--mute);margin:0;flex:1}
+.glass .btn{align-self:flex-start;margin-top:.6rem}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:.3rem}
+.tags i{font-style:normal;font-size:.78rem;padding:2px 10px;border-radius:999px;border:1px solid var(--line);color:var(--a)}
+.kind{font-family:var(--display);font-weight:700;letter-spacing:.12em;color:var(--c);font-size:.95rem;overflow-wrap:anywhere}
+.sym{font-family:var(--display);font-weight:900;font-size:1.5rem;color:var(--b);line-height:1}
+
+/* books: a golden library, real 3D books on a shelf */
+.shelf{display:grid;gap:26px;grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr));margin-top:2.2rem;text-align:left}
+.bookcard{display:flex;flex-direction:column;gap:.6rem;min-width:0;border-color:color-mix(in srgb,var(--gold) 28%,transparent)!important;
+  background:linear-gradient(170deg,color-mix(in srgb,var(--cv) 55%,rgba(14,12,10,.8)),rgba(10,8,6,.82))!important}
+.stage3{position:relative;height:19.5rem;display:grid;place-items:end center;padding-bottom:1.9rem;perspective:950px;
+  background:radial-gradient(60% 55% at 50% 52%,color-mix(in srgb,var(--cv2) 38%,transparent),transparent 72%)}
+.stage3::before{content:"";position:absolute;left:6%;right:6%;bottom:1rem;height:11px;border-radius:6px;
+  background:linear-gradient(#7a5528,#2b1b09);box-shadow:0 16px 30px -8px rgba(0,0,0,.8),0 0 0 1px rgba(255,210,122,.18),0 -1px 0 rgba(255,225,160,.4) inset}
+.stage3::after{content:"";position:absolute;bottom:1.15rem;width:9.5rem;height:16px;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.65),transparent);filter:blur(3px)}
+.sway{transform-style:preserve-3d;animation:bsway 8s ease-in-out infinite alternate;position:relative;z-index:1}
+.bookcard:hover .sway{animation-play-state:paused}
+@keyframes bsway{from{transform:rotateY(-12deg) translateY(0)}to{transform:rotateY(12deg) translateY(-9px)}}
+.bk{--w:10.2rem;--h:14.2rem;--d:2rem;position:relative;width:var(--w);height:var(--h);transform-style:preserve-3d;
+  transform:rotateX(5deg) rotateY(var(--bry,-20deg));transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+.bk .f{position:absolute;backface-visibility:visible}
+.bk .front{inset:0;transform:translateZ(calc(var(--d) / 2));border-radius:3px 9px 9px 3px;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:space-between;padding:.9rem .85rem .8rem;
+  background:linear-gradient(155deg,var(--cv2),var(--cv) 58%,#05060d);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.1),inset 5px 0 9px -3px rgba(0,0,0,.55)}
+.bk .front::before{content:"";position:absolute;inset:7px;border:1px solid color-mix(in srgb,var(--gold) 65%,transparent);border-radius:2px 6px 6px 2px;pointer-events:none}
+.bk .front::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.22) 48%,transparent 62%);background-size:260% 100%;animation:foil 6s ease-in-out infinite;pointer-events:none}
+@keyframes foil{0%{background-position:130% 0}60%,100%{background-position:-60% 0}}
+.bk .au{font-family:var(--display);font-size:.5rem;letter-spacing:.3em;color:var(--gold);text-align:center;margin-top:.15rem}
+.bk .art{width:100%;height:auto;display:block;color:var(--gold);margin:.2rem 0}
+.bk .tt{text-align:center;position:relative;z-index:1}
+.bk .tt b{display:block;font-size:1.02rem;line-height:1.2;font-weight:600;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.6);overflow-wrap:anywhere}
+.bk .tt small{display:block;font-size:.58rem;letter-spacing:.06em;opacity:.85;margin-top:.25rem;color:#f4e3b8}
+.bk .imp{font-family:var(--brand);font-size:.5rem;letter-spacing:.34em;text-align:center;color:var(--gold);opacity:.9;margin-top:.45rem}
+.bk .back{inset:0;transform:translateZ(calc(var(--d) / -2));border-radius:9px 3px 3px 9px;background:linear-gradient(155deg,var(--cv),#05060d)}
+.bk .spine{width:var(--d);height:var(--h);left:calc(var(--d) / -2);top:0;transform:rotateY(-90deg);
+  background:linear-gradient(90deg,var(--cv),var(--cv2) 50%,var(--cv));display:grid;place-items:center;border-radius:2px;overflow:hidden}
+.bk .spine span{writing-mode:vertical-rl;font-family:var(--brand);font-size:.62rem;letter-spacing:.4em;color:var(--gold);white-space:nowrap}
+.bk .pgs{width:var(--d);height:calc(var(--h) - 8px);left:calc(var(--w) - var(--d) / 2);top:4px;transform:rotateY(90deg);
+  background:repeating-linear-gradient(90deg,#f6efe0 0 2px,#d9cdb2 2px 3px)}
+.bk .top,.bk .bot{width:var(--w);height:var(--d);left:0;background:repeating-linear-gradient(0deg,#f6efe0 0 2px,#d9cdb2 2px 3px)}
+.bk .top{top:calc(var(--d) / -2);transform:rotateX(90deg)}
+.bk .bot{top:calc(var(--h) - var(--d) / 2);transform:rotateX(-90deg)}
+.bk-1{--cv:#12306d;--cv2:#3a78e8}.bk-2{--cv:#3b1458;--cv2:#9b5cf0}.bk-3{--cv:#6b1f3d;--cv2:#ff6f8f}
+.bookcard{--gold:#f1c76b}
+.art .wv{animation:wvx 5s linear infinite}
+@keyframes wvx{to{transform:translateX(-25px)}}
+.art .nd{transform-box:fill-box;transform-origin:center;animation:spin 18s linear infinite}
+.art .st{animation:stp 3.2s ease-in-out infinite}
+@keyframes stp{50%{opacity:.35}}
+.en{color:var(--ink)!important;font-weight:600}
+.dust{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.dust i{position:absolute;bottom:-12px;left:var(--x);width:var(--s);height:var(--s);border-radius:50%;background:#ffd98a;box-shadow:0 0 8px #ffcf70;opacity:0;animation:dst var(--t) linear var(--dl) infinite}
+@keyframes dst{0%{transform:translate(0,0);opacity:0}15%{opacity:.7}85%{opacity:.5}100%{transform:translate(var(--dx),-85vh);opacity:0}}
+
+/* live board */
+.live-dot{display:inline-flex;align-items:center;gap:8px;font-family:var(--display);font-weight:700;letter-spacing:.14em;color:var(--a);margin-bottom:1rem}
+.live-dot i{width:10px;height:10px;border-radius:50%;background:var(--a);box-shadow:0 0 12px var(--a);animation:pulse 1.6s ease-in-out infinite}
+.board{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));margin:2rem 0 2.6rem;text-align:left}
+.bd{display:flex;flex-direction:column;gap:.5rem;min-width:0}
+.bd .kind{margin-bottom:.1rem}
+.bd .big{font-family:var(--display);font-weight:900;font-size:clamp(2.3rem,6vw,3.6rem);line-height:1;letter-spacing:.04em;font-variant-numeric:tabular-nums}
+.bd .greet{color:var(--a);font-weight:600}
+.bd .dt{color:var(--mute);font-size:.98rem;margin:0}
+.daybar{height:6px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden;margin-top:.4rem}
+.daybar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--a),var(--b));transition:width 1s}
+.bd ul{list-style:none;margin:.3rem 0 0;padding:0;display:grid;gap:.55rem}
+.bd li{font-size:.95rem;line-height:1.4;color:var(--mute);overflow-wrap:anywhere}
+.bd li b{color:var(--ink);font-weight:600}
+.bd .up{font-size:.8rem;color:var(--mute);margin-top:auto;padding-top:.4rem}
+.bd .state{color:var(--mute);font-size:.95rem}
+.wx-temp{font-family:var(--brand);font-weight:300;font-size:clamp(2.2rem,5vw,3.2rem);line-height:1.1}
+.mg{display:inline-block;min-width:2.9rem;margin-right:.4rem;padding:1px 8px;border-radius:8px;font-family:var(--display);font-weight:700;color:#071016;background:var(--cyan);text-align:center}
+.mg.m4{background:var(--amb)}.mg.m5{background:#ff5a6a}
+
+/* ticker: live strip with time, always visible */
+.ticker{position:fixed;z-index:12;left:0;right:0;bottom:0;display:flex;align-items:stretch;height:calc(40px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);background:rgba(5,6,13,.88);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line)}
+.tk-live{display:flex;align-items:center;gap:9px;padding:0 max(12px,2vw);font-family:var(--display);font-weight:700;letter-spacing:.06em;white-space:nowrap;border-right:1px solid var(--line);color:var(--ink)}
+.tk-live i{width:9px;height:9px;border-radius:50%;background:var(--mag);box-shadow:0 0 10px var(--mag);animation:pulse 1.6s ease-in-out infinite}
+.tk-live time{font-variant-numeric:tabular-nums;font-size:1.05rem}
+.tk-live small{color:var(--mute);font-family:var(--body);font-weight:400;letter-spacing:0}
+.tk-track{flex:1;min-width:0;overflow:hidden;display:flex;align-items:center}
+.tk-move{display:flex;flex:none;white-space:nowrap;animation:tkmove 80s linear infinite;will-change:transform}
+.tk-track:hover .tk-move{animation-play-state:paused}
+.tki{padding:0 1.1rem;color:var(--mute);font-size:.92rem}
+.tki b{color:var(--ga);font-weight:600;margin-right:.45rem}
+@keyframes tkmove{to{transform:translateX(-50%)}}
+
+/* author */
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(13rem,1fr));gap:12px;margin:1.4rem 0}
+.fact{padding:.8rem 1rem;border-radius:16px;background:var(--glass);border:1px solid var(--line);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);overflow-wrap:anywhere}
+.fact span{display:block;font-family:var(--display);font-weight:700;letter-spacing:.12em;color:var(--a);font-size:.95rem}
+.quote{margin:1.6rem 0 0;padding-left:1.1rem;border-left:2px solid var(--a);font-size:1.2rem;line-height:1.5}
+.roles{font-family:var(--display);font-weight:700;letter-spacing:.1em;color:var(--b);margin-bottom:1rem;overflow-wrap:anywhere}
+
+/* timelines: education and journey are real sequences */
+.tl{list-style:none;margin:1.6rem 0 0;padding:0 0 0 1.4rem;border-left:1px solid var(--line);display:grid;gap:1.7rem}
+.tl li{position:relative}
+.tl li::before{content:"";position:absolute;left:calc(-1.4rem - 5px);top:.55rem;width:9px;height:9px;border-radius:50%;background:var(--a);box-shadow:0 0 12px var(--a)}
+.tl .when{font-family:var(--display);font-weight:700;letter-spacing:.14em;color:var(--c);font-size:.95rem}
+.tl h3{margin:.1rem 0 0}
+.tl .at{color:var(--ink);font-weight:600;margin:.1rem 0}
+.tl p{color:var(--mute);margin:.2rem 0 0}
+
+/* about, contact */
+.three{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));margin-top:1.6rem;text-align:left}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(9rem,1fr));gap:14px;margin-top:2rem}
+.stat b{display:block;font-family:var(--brand);font-weight:300;font-size:clamp(2rem,5vw,3.2rem);line-height:1.1;background:linear-gradient(120deg,var(--a),var(--c));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.stat span{color:var(--mute)}
+.sub-h{font-family:var(--brand);font-weight:400;font-size:clamp(1.2rem,2.6vw,1.7rem);margin:3.2rem 0 .6rem}
+a.glass{text-decoration:none;color:inherit}
+a.glass h3::after{content:" ↗";color:var(--a);font-weight:400}
+.cdet{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr));margin-top:1.6rem;text-align:left}
+.cdet .v{font-weight:600;overflow-wrap:anywhere}
+.cdet .glass{gap:.4rem}
+.mini{align-self:flex-start;margin-top:.5rem;padding:6px 16px;border-radius:999px;border:1px solid var(--line);background:var(--glass);color:var(--ink);font:inherit;font-size:.9rem;cursor:pointer;text-decoration:none;display:inline-block}
+.mini:hover{border-color:var(--a)}
+.avail{display:inline-flex;align-items:center;gap:8px;font-weight:600}
+.avail i{width:9px;height:9px;border-radius:50%;background:#46e38a;box-shadow:0 0 10px #46e38a}
+.avail.off i{background:#ff5a6a;box-shadow:0 0 10px #ff5a6a}
+
+/* footer */
+.cta{padding-block:clamp(3rem,10vh,6rem) 2rem;text-align:center}
+.cta h2{font-size:clamp(1.6rem,4vw,2.8rem);max-width:46rem;margin-inline:auto}
+.cta .lede{margin-inline:auto}
+footer{position:relative;z-index:1;padding:2.5rem max(16px,5vw) calc(5.5rem + env(safe-area-inset-bottom,0px));color:var(--mute);font-size:.98rem;border-top:1px solid var(--line);background:linear-gradient(180deg,transparent,rgba(5,6,13,.7))}
+.fgrid{display:grid;gap:2rem 1.6rem;grid-template-columns:minmax(0,1.5fr) repeat(4,minmax(0,1fr));max-width:84rem;margin-inline:auto}
+.fgrid>*{min-width:0}
+.fgrid h4{margin:0 0 .7rem;font-family:var(--display);font-weight:700;letter-spacing:.14em;color:var(--ink);font-size:1rem}
+.fgrid a{display:block;text-decoration:none;padding:3px 0;overflow-wrap:anywhere}
+.fgrid a:hover{color:var(--ga)}
+.fgrid p{overflow-wrap:break-word}
+.fbrand{display:flex;align-items:center;gap:10px;font-family:var(--brand);font-weight:500;letter-spacing:.2em;color:var(--ink);font-size:1.1rem;margin-bottom:.8rem}
+.fend{max-width:84rem;margin:2rem auto 0;padding-top:1.2rem;border-top:1px solid var(--line);display:flex;flex-wrap:wrap;justify-content:space-between;gap:.6rem}
+
+/* brand panels: each product gets its own palette, wordmark and animated emblem */
+.brands{display:grid;gap:28px;margin-top:2.2rem}
+.brand-panel{
+  --a:#fff;--b:#fff;--tint:rgba(14,16,34,.8);--glow:rgba(255,255,255,.3);--edge:rgba(255,255,255,.2);
+  position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:2rem;align-items:center;text-align:left;
+  padding:clamp(1.4rem,4vw,3rem);border-radius:28px;overflow:hidden;min-width:0;
+  background:linear-gradient(150deg,var(--tint),rgba(5,6,13,.8));
+  border:1px solid var(--edge);
+  -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);
+  box-shadow:0 40px 90px -45px var(--glow),inset 0 1px 0 rgba(255,255,255,.07);
+  transition:transform .35s ease,box-shadow .35s ease;
+}
+.brand-panel:hover{transform:translateY(-4px);box-shadow:0 50px 100px -40px var(--glow),inset 0 1px 0 rgba(255,255,255,.1)}
+.brand-panel::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.07) 50%,transparent 60%);transform:translateX(-120%);animation:psweep 8s ease-in-out infinite}
+.brand-panel::after{content:"";position:absolute;right:-10%;top:-30%;width:60%;aspect-ratio:1;border-radius:50%;pointer-events:none;background:radial-gradient(closest-side,var(--glow),transparent);opacity:.55}
+.brand-panel.rev::after{right:auto;left:-10%}
+.brand-panel>*{position:relative;z-index:1;min-width:0}
+.brand-panel.rev .bp-info{order:2}
+@keyframes psweep{0%,55%{transform:translateX(-120%)}100%{transform:translateX(120%)}}
+.bp-kind{font-family:var(--display);font-weight:700;letter-spacing:.16em;color:var(--a);font-size:.95rem;margin-bottom:.5rem;overflow-wrap:anywhere}
+.bp-tag{font-size:1.25rem;font-weight:600;margin:.5rem 0 .7rem}
+.bp-info p{color:var(--mute)}
+.bp-info p.bp-tag{color:var(--ink)}
+.brand-panel .tags i{border-color:var(--edge);color:var(--a)}
+.bp-btn{display:inline-block;margin-top:1.1rem;padding:12px 26px;border-radius:999px;font-weight:600;text-decoration:none;color:#0a0a12;background:linear-gradient(120deg,var(--a),var(--b));box-shadow:0 12px 32px -12px var(--glow);transition:transform .2s,filter .2s}
+.bp-btn:hover{transform:translateY(-2px);filter:brightness(1.1)}
+.bp-em{display:grid;place-items:center}
+.brand-panel .clocks{display:grid;gap:10px;margin:1.2rem 0 0;grid-template-columns:repeat(auto-fit,minmax(5.2rem,1fr))}
+.clock{padding:.55rem .75rem;border-radius:14px;background:var(--glass);border:1px solid var(--line)}
+.clock span{display:block;font-size:.85rem;color:var(--mute)}
+.clock time{font-family:var(--display);font-size:1.35rem;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.bp-abhi{--a:#f6d89a;--b:#e9a94b;--tint:rgba(18,26,62,.82);--glow:rgba(233,169,75,.42);--edge:rgba(246,216,154,.3)}
+.bp-astra{--a:#a58bff;--b:#ff4fa3;--tint:rgba(30,12,70,.82);--glow:rgba(165,139,255,.42);--edge:rgba(165,139,255,.32)}
+.bp-search{--a:#62d8ff;--b:#7dffd1;--tint:rgba(5,34,46,.82);--glow:rgba(98,216,255,.38);--edge:rgba(98,216,255,.3)}
+.bp-h24{--a:#ff5a6a;--b:#ffb347;--tint:rgba(52,10,20,.82);--glow:rgba(255,90,106,.4);--edge:rgba(255,110,120,.32)}
+.bp-farm{--a:#46e38a;--b:#c6ff5a;--tint:rgba(6,40,22,.82);--glow:rgba(70,227,138,.4);--edge:rgba(70,227,138,.32)}
+
+/* wordmarks */
+.wm{font-size:clamp(2rem,5vw,3.6rem);line-height:1.05;overflow-wrap:anywhere}
+.wm small{display:block}
+.wm-abhi{font-family:var(--brand);font-weight:500;color:#fff;letter-spacing:.01em}
+.wm-abhi b,.wm-farm{background:linear-gradient(120deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;font-weight:500}
+.wm-astra{font-family:var(--brand);font-weight:300;text-transform:uppercase;letter-spacing:.16em;font-size:clamp(1.5rem,4vw,2.9rem);background:linear-gradient(120deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.wm-astra small{font-size:.3em;letter-spacing:.42em;margin-top:.6rem;-webkit-text-fill-color:var(--mute);color:var(--mute)}
+.wm-search{font-family:var(--display);font-weight:900;letter-spacing:.06em;color:var(--a);text-shadow:0 0 28px rgba(98,216,255,.35)}
+.wm-search small{font-family:var(--body);font-weight:600;font-size:.34em;letter-spacing:.5em;color:var(--ink);text-shadow:none;margin-top:.2rem}
+.wm-24{font-family:var(--brand);display:flex;flex-wrap:wrap;align-items:baseline;gap:.2rem .7rem}
+.wm-24 .pre{flex-basis:100%;font-weight:400;font-size:.3em;letter-spacing:.5em;color:var(--mute)}
+.wm-24 .n{font-weight:700;font-size:1.5em;line-height:.95;background:linear-gradient(120deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.wm-24 .u{font-weight:400;font-size:.45em;letter-spacing:.35em;color:var(--ink)}
+.wm-farm{font-family:var(--brand);font-size:clamp(1.6rem,4.2vw,3rem)}
+.wm-farm small{font-family:var(--display);font-weight:900;letter-spacing:.4em;font-size:.5em;margin-top:.3rem;-webkit-text-fill-color:var(--a);color:var(--a)}
+
+/* emblems */
+.em{position:relative;width:min(100%,19rem);aspect-ratio:1;display:block}
+.em-abhi{display:grid;place-items:center}
+.em-abhi .orb{width:58%;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;background:radial-gradient(circle at 32% 28%,#fff6dd,#f6d89a 35%,#e9a94b 70%,#8a5a14);box-shadow:0 0 70px rgba(246,216,154,.45),inset -12px -16px 30px rgba(90,50,0,.45);animation:breathe 4.5s ease-in-out infinite}
+.em-abhi .bars{display:flex;gap:5px;align-items:center;height:38%}
+.em-abhi .bars i{width:5px;height:100%;border-radius:3px;background:rgba(46,26,4,.8);animation:eq 1.3s ease-in-out infinite}
+.em-abhi .bars i:nth-child(2n){animation-delay:-.4s}
+.em-abhi .bars i:nth-child(3n){animation-delay:-.8s}
+.em-abhi .bars i:nth-child(5n){animation-delay:-1.1s}
+.em-abhi .ring{position:absolute;inset:8%;border-radius:50%;border:1px solid rgba(246,216,154,.55);animation:ripple 4.5s ease-out infinite}
+.em-abhi .ring.r2{animation-delay:-2.25s}
+@keyframes breathe{50%{transform:scale(1.07)}}
+@keyframes eq{0%,100%{transform:scaleY(.18)}50%{transform:scaleY(1)}}
+@keyframes ripple{from{transform:scale(.62);opacity:.9}to{transform:scale(1.12);opacity:0}}
+.em-astra .spin{transform-box:view-box;transform-origin:100px 100px;animation:spin 16s linear infinite}
+.em-astra .s2{animation-duration:24s;animation-direction:reverse}
+.em-astra .s3{animation-duration:34s}
+.em-astra .core-glow{transform-box:view-box;transform-origin:100px 100px;animation:breathe 4s ease-in-out infinite}
+.em-astra .tw{animation:twinkle 3s ease-in-out infinite}
+.em-astra .t2{animation-delay:-1s}.em-astra .t3{animation-delay:-2s}
+@keyframes twinkle{50%{opacity:.15}}
+.em-search .lens{position:absolute;left:10%;top:8%;width:62%;aspect-ratio:1;border-radius:50%;border:7px solid transparent;overflow:hidden;background:linear-gradient(#04141b,#04141b) padding-box,linear-gradient(135deg,#62d8ff,#7dffd1) border-box;box-shadow:0 0 44px rgba(98,216,255,.32)}
+.em-search .sweep{position:absolute;inset:-50%;background:conic-gradient(from 0deg,rgba(98,216,255,0) 0 72%,rgba(98,216,255,.6) 100%);animation:spin 3.2s linear infinite}
+.em-search .blip{position:absolute;width:8px;height:8px;border-radius:50%;background:#7dffd1;box-shadow:0 0 12px #7dffd1;animation:blink 3.2s ease-in-out infinite}
+.em-search .b1{left:58%;top:30%}.em-search .b2{left:30%;top:56%;animation-delay:-1.1s}.em-search .b3{left:64%;top:64%;animation-delay:-2.1s}
+.em-search .handle{position:absolute;left:62%;top:60%;width:34%;height:9px;border-radius:5px;background:linear-gradient(90deg,#62d8ff,#7dffd1);transform:rotate(45deg);transform-origin:left center;box-shadow:0 0 18px rgba(98,216,255,.5)}
+.em-search .res{position:absolute;left:4%;right:4%;bottom:2%;display:grid;gap:9px}
+.em-search .res i{display:block;height:10px;border-radius:5px;background:linear-gradient(90deg,rgba(98,216,255,.22),rgba(125,255,209,.6),rgba(98,216,255,.22));background-size:200% 100%;animation:shim 2.6s linear infinite}
+.em-search .res i:nth-child(1){width:100%}
+.em-search .res i:nth-child(2){width:80%;animation-delay:-.7s}
+.em-search .res i:nth-child(3){width:60%;animation-delay:-1.4s}
+@keyframes blink{0%,100%{opacity:.1;transform:scale(.6)}40%{opacity:1;transform:scale(1)}}
+@keyframes shim{to{background-position:-200% 0}}
+.em-24 .pulse{transform-box:view-box;transform-origin:100px 100px;animation:ripple 4s ease-out infinite}
+.em-24 .p2{animation-delay:-2s}
+.em-24 .dash{transform-box:view-box;transform-origin:100px 100px;animation:spin 60s linear infinite}
+.em-24 .hand{transform-box:view-box;transform-origin:100px 100px;transition:transform 2s cubic-bezier(.2,.8,.2,1)}
+.em-24 .n24{font-family:var(--brand);font-weight:700;font-size:30px;fill:url(#h24G)}
+.em-24 .tk{font-family:var(--display);font-weight:700;font-size:10px;fill:#ffd2c9}
+.em-farm .rays{transform-box:view-box;transform-origin:150px 44px;animation:spin 30s linear infinite}
+.em-farm .stem{fill:none;stroke:#6dff9a;stroke-width:4;stroke-linecap:round;stroke-dasharray:90;stroke-dashoffset:90;animation:grow 7s ease-in-out infinite}
+.em-farm .leaf{fill:#46e38a;transform-box:fill-box;transform-origin:center;transform:scale(0);animation:leafin 7s ease-in-out infinite}
+.em-farm .bud{fill:#ffd45a;transform-box:fill-box;transform-origin:center;transform:scale(0);animation:leafin 7s ease-in-out infinite}
+.em-farm .sway{transform-box:fill-box;transform-origin:50% 100%;animation:sway 4s ease-in-out infinite alternate}
+.em-farm .p2 *{animation-delay:.5s}.em-farm .p3 *{animation-delay:1s}
+@keyframes grow{0%{stroke-dashoffset:90}35%,85%{stroke-dashoffset:0}100%{stroke-dashoffset:90}}
+@keyframes leafin{0%,25%{transform:scale(0)}45%,85%{transform:scale(1)}100%{transform:scale(0)}}
+@keyframes sway{from{transform:rotate(-2.5deg)}to{transform:rotate(2.5deg)}}
+
+/* opening: tap to enter, the logo explodes into view, the name types in note by note, brands flash, iris reveal */
+html.intro{--d0:5.6s}
+html.intro:not(.go) *{animation-play-state:paused}
+.intro-ov{display:none;position:fixed;inset:0;z-index:70;place-items:center;overflow:hidden;background:radial-gradient(60% 60% at 50% 50%,#0b0d22,#05060d 72%);clip-path:circle(150% at 50% 50%)}
+html.intro .intro-ov{display:grid}
+html.intro .intro-ov.play{animation:ovout 1s cubic-bezier(.65,0,.25,1) 5.6s forwards}
+.intro-ov.skip{animation:ovout .5s ease 0s forwards!important}
+@keyframes ovout{0%{clip-path:circle(150% at 50% 50%)}99%{visibility:visible}100%{clip-path:circle(0% at 50% 50%);visibility:hidden}}
+#boom{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.io-flash{position:absolute;inset:0;margin:auto;width:150vmax;height:150vmax;border-radius:50%;pointer-events:none;background:radial-gradient(closest-side,#fff,rgba(98,216,255,.8) 25%,rgba(140,108,255,.35) 55%,transparent 72%);transform:scale(0);opacity:0;animation:flash 1.2s ease-out .5s both}
+@keyframes flash{0%{transform:scale(0);opacity:1}60%{opacity:.7}100%{transform:scale(1);opacity:0}}
+.io-wave{position:absolute;inset:0;margin:auto;width:30vmin;height:30vmin;border-radius:50%;border:2px solid var(--cyan);opacity:0;pointer-events:none;animation:wave 1.7s cubic-bezier(.1,.7,.3,1) both}
+.io-wave.w1{animation-delay:.5s}.io-wave.w2{animation-delay:.65s;border-color:var(--mag)}.io-wave.w3{animation-delay:.8s;border-color:var(--amb)}
+@keyframes wave{0%{transform:scale(.1);opacity:.9}100%{transform:scale(5);opacity:0}}
+.io-stage{position:relative;display:grid;justify-items:center;gap:1rem;width:100%;padding-inline:16px;animation:shake .6s linear .5s both}
+@keyframes shake{0%,100%{transform:translate(0)}10%{transform:translate(-6px,4px)}20%{transform:translate(7px,-5px)}30%{transform:translate(-5px,-6px)}40%{transform:translate(5px,5px)}50%{transform:translate(-3px,2px)}60%{transform:translate(2px,-2px)}}
+.io-logo{width:min(40vmin,17rem);aspect-ratio:1;animation:logoin 1.7s cubic-bezier(.16,.9,.2,1) .5s both;filter:drop-shadow(0 0 40px rgba(98,216,255,.45))}
+@keyframes logoin{0%{transform:scale(.04) rotate(-900deg);opacity:0}25%{opacity:1}100%{transform:scale(1) rotate(0)}}
+.io-word{display:flex;justify-content:center;font-family:var(--brand);font-weight:500;font-size:clamp(2.2rem,11.5vw,5.6rem);line-height:1.05;letter-spacing:.03em;max-width:100%}
+.io-word i{font-style:normal;display:inline-block;color:var(--lc);-webkit-text-fill-color:var(--lc);text-shadow:0 0 26px var(--lc);animation:letin .9s cubic-bezier(.16,.9,.2,1) calc(1.9s + var(--i) * .11s) both}
+@keyframes letin{0%{opacity:0;transform:translateY(.5em) scale(1.9);filter:blur(10px)}100%{opacity:1;transform:none;filter:none}}
+.io-sub{font-family:var(--display);font-weight:700;letter-spacing:.3em;color:var(--cyan);text-align:center;font-size:clamp(.7rem,2.4vw,1rem);animation:fadeup 1s ease 2.9s both}
+.io-brands{position:relative;height:1.8rem;width:100%;text-align:center}
+.io-brands span{position:absolute;left:0;right:0;font-family:var(--display);font-weight:700;letter-spacing:.2em;font-size:clamp(.95rem,2.6vw,1.45rem);opacity:0;animation:bname .65s ease both}
+.io-brands .b1{color:#f6d89a;animation-delay:3.3s}
+.io-brands .b2{color:#b79cff;animation-delay:3.8s}
+.io-brands .b3{color:#62d8ff;animation-delay:4.3s}
+.io-brands .b4{color:#ff6b78;animation-delay:4.8s}
+@keyframes bname{0%{opacity:0;transform:translateY(10px)}25%,70%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-10px)}}
+.io-skip{position:absolute;right:max(16px,3vw);bottom:calc(env(safe-area-inset-bottom,0px) + 20px);padding:8px 18px;border-radius:999px;border:1px solid var(--line);background:var(--glass);color:var(--mute);font:inherit;cursor:pointer;z-index:3}
+.io-skip:hover{color:var(--ink);border-color:var(--cyan)}
+.intro-ov:not(.play) .io-skip{display:none}
+/* gate */
+.io-gate{position:absolute;inset:0;z-index:2;display:grid;place-content:center;justify-items:center;gap:1.1rem;text-align:center;padding:16px;background:radial-gradient(60% 60% at 50% 50%,#0b0d22,#05060d 72%);transition:opacity .35s ease,visibility .35s}
+.io-gate.out{opacity:0;visibility:hidden;pointer-events:none}
+.io-gate,.io-gate *{animation-play-state:running!important}
+.gate-mark{position:relative;width:min(34vmin,11rem);aspect-ratio:1;display:grid;place-items:center}
+.gate-mark svg{width:70%;height:70%;filter:drop-shadow(0 0 22px rgba(98,216,255,.55));animation:breathe 3.6s ease-in-out infinite}
+.gate-mark::before,.gate-mark::after{content:"";position:absolute;inset:0;border-radius:50%;border:1px solid rgba(98,216,255,.55);animation:ripple 3.2s ease-out infinite}
+.gate-mark::after{animation-delay:-1.6s;border-color:rgba(255,79,163,.5)}
+.gate-name{font-family:var(--brand);font-weight:500;letter-spacing:.34em;font-size:clamp(1.1rem,5vw,1.7rem);padding-left:.34em}
+.gate-hint{font-family:var(--display);font-weight:700;letter-spacing:.3em;font-size:.68rem;color:var(--cyan);animation:twinkle 2.4s ease-in-out infinite}
+.io-enter{display:inline-flex;align-items:center;gap:.6rem;padding:14px 30px;border-radius:999px;border:0;cursor:pointer;font:600 1rem var(--body);color:#06070f;
+  background:linear-gradient(120deg,var(--cyan),#9b86ff 55%,var(--mag));box-shadow:0 14px 40px -12px rgba(98,216,255,.7);transition:transform .2s,filter .2s}
+.io-enter:hover{transform:translateY(-2px);filter:brightness(1.1)}
+.io-enter svg{width:1.15rem;height:1.15rem}
+.io-silent{background:none;border:0;color:var(--mute);font:inherit;font-size:.85rem;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:6px 10px}
+.io-silent:hover{color:var(--ink)}
+
+/* brand lockup at the top of every section */
+.sb{display:flex;align-items:center;gap:.55rem;margin-bottom:.95rem;font-family:var(--brand);letter-spacing:.3em;font-size:.68rem;color:var(--mute);min-width:0}
+.sb svg{width:24px;height:24px;flex:none;filter:drop-shadow(0 0 8px color-mix(in srgb,var(--a) 70%,transparent))}
+.sb b{font-weight:500;color:var(--ink);white-space:nowrap}
+.sb i{font-style:normal;opacity:.5}
+.sb span{color:var(--a);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb::after{content:"";height:1px;width:4.5rem;background:linear-gradient(90deg,var(--a),transparent);flex:none}
+.mid .sb{justify-content:center}
+.mid .sb::after{display:none}
+/* touch ripple + sound toggle */
+.rip{position:fixed;left:0;top:0;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;border:2px solid var(--rc,#62d8ff);pointer-events:none;z-index:60;animation:ripx .9s ease-out forwards;box-shadow:0 0 18px var(--rc,#62d8ff)}
+.rip.r2{animation-delay:.12s;opacity:0}
+@keyframes ripx{0%{transform:scale(.3);opacity:.9}100%{transform:scale(11);opacity:0}}
+.nav-l{display:flex;align-items:center;gap:10px;flex:none;pointer-events:none}
+.nav-l>*{pointer-events:auto}
+.snd{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;cursor:pointer;color:var(--ink);background:var(--glass);border:1px solid var(--line);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);transition:border-color .2s,color .2s}
+.snd:hover{border-color:var(--a);color:var(--a)}
+.snd svg{width:18px;height:18px}
+.snd[aria-pressed="false"] .wv2{display:none}
+.snd[aria-pressed="true"] .sl{display:none}
+
+@media (max-width:1000px){
+  .fgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .fgrid>:first-child{grid-column:1/-1}
+}
+@media (max-width:820px){
+  .cue{display:none}
+  .lockup::after{display:none}
+  .hero{min-height:92svh}
+  .brand .t{display:none}
+  .stage3{height:18rem}
+  .sb{font-size:.62rem;letter-spacing:.24em}
+  .sb::after{width:2.5rem}
+  .nav{justify-content:flex-start}
+  .right .col{margin-left:0}
+  .col,.col.lg{max-width:none}
+  .scene{min-height:0}
+  .brand-panel{grid-template-columns:1fr;gap:1.4rem}
+  .brand-panel .bp-em{order:-1}
+  .brand-panel.rev .bp-info{order:0}
+  .em{width:min(70%,14rem)}
+  .brand-panel::after{right:-30%}
+  .tk-live small{display:none}
+}
+@media (max-width:520px){
+  .fgrid{grid-template-columns:minmax(0,1fr)}
+  .tki{padding:0 .8rem}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .intro-ov{display:none!important}
+  .sway,.bk .front::after,.dust i,.art *{animation:none!important}
+  body::before,.wordmark,.a1,.a2,.a3,.a4,.cue,.cue span,.live-dot i,.tk-live i,.wm-bg,.lr,.tk-move{animation:none}
+  .brand-panel::before,.brand-panel *{animation:none!important}
+  .glass,.btn,.brand-panel,.bp-btn{transition:none}
+  .tk-track{overflow-x:auto}
+}
+
+/* about: every platform and pillar wears its own colours */
+.plats{grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr))}
+.plat{position:relative;overflow:hidden;display:block;text-decoration:none;color:inherit;border-color:color-mix(in srgb,var(--pa) 35%,transparent)!important;
+  background:linear-gradient(155deg,color-mix(in srgb,var(--pa) 14%,rgba(10,12,26,.85)),rgba(6,7,16,.85))!important;transition:transform .3s,box-shadow .3s}
+.plat::before{content:"";position:absolute;right:-30%;top:-40%;width:80%;aspect-ratio:1;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--pb) 45%,transparent),transparent);opacity:.6;pointer-events:none;transition:opacity .3s,transform .5s}
+.plat:hover{transform:translateY(-5px);box-shadow:0 26px 60px -28px var(--pa)}
+.plat:hover::before{opacity:1;transform:scale(1.25)}
+.plat>*{position:relative}
+.pi{display:grid;place-items:center;width:2.6rem;height:2.6rem;border-radius:14px;margin-bottom:.8rem;font-family:var(--display);font-weight:900;font-size:1.05rem;color:#08090f;background:linear-gradient(135deg,var(--pa),var(--pb));box-shadow:0 10px 26px -10px var(--pa)}
+.plat h3{color:var(--pa)}
+.go-ar{position:absolute!important;right:1rem;top:1rem;font-size:1.2rem;color:var(--pa);opacity:.55;transition:transform .3s,opacity .3s}
+.plat:hover .go-ar{transform:translate(3px,-3px);opacity:1}
+.pc{position:relative;overflow:hidden;border-color:color-mix(in srgb,var(--pa) 38%,transparent)!important;
+  background:linear-gradient(160deg,color-mix(in srgb,var(--pa) 13%,rgba(10,12,26,.85)),rgba(6,7,16,.86))!important}
+.pc::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:linear-gradient(90deg,var(--pa),var(--pb))}
+.pc .kind{color:var(--pa)}
+.pc-i{position:absolute;right:1rem;top:.6rem;font-size:2.6rem;line-height:1;opacity:.22;color:var(--pa);animation:breathe 5s ease-in-out infinite}
+.stat{position:relative;border-color:color-mix(in srgb,var(--pa) 35%,transparent)!important;background:linear-gradient(160deg,color-mix(in srgb,var(--pa) 12%,rgba(10,12,26,.8)),rgba(6,7,16,.8))!important}
+.stat b{background:linear-gradient(120deg,var(--pa),var(--pb));-webkit-background-clip:text;background-clip:text;color:transparent!important;-webkit-text-fill-color:transparent}
+.th-about .quote{border-image:linear-gradient(180deg,#f6d89a,#62d8ff,#ff4fa3) 1;background:linear-gradient(100deg,rgba(246,216,154,.08),rgba(98,216,255,.06),rgba(255,79,163,.08))}
+.th-about .sub-h{background:linear-gradient(100deg,#f6d89a,#62d8ff 55%,#ff4fa3);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+@media (prefers-reduced-motion:reduce){.pc-i{animation:none}.plat,.plat::before{transition:none}}
+.go-ar{display:none}
+
+/* PDF library: every file has its own swatch */
+.pdf-h{margin-top:3.2rem;text-align:center}
+.pdf-l{text-align:center;margin-inline:auto}
+.pdfs{display:grid;gap:22px;grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr));margin-top:1.8rem;text-align:left}
+.pdfc{position:relative;display:flex;flex-direction:column;gap:.45rem;min-width:0;overflow:hidden;padding:1.4rem 1.3rem 1.2rem;border-radius:24px;text-decoration:none;color:inherit;
+  border:1px solid color-mix(in srgb,var(--pa) 38%,transparent);
+  background:linear-gradient(155deg,color-mix(in srgb,var(--pa) 18%,rgba(12,10,8,.88)),rgba(6,6,12,.9));
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .35s}
+.pdfc::before{content:"";position:absolute;right:-25%;top:-35%;width:85%;aspect-ratio:1;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--pb) 50%,transparent),transparent);opacity:.55;transition:opacity .35s,transform .6s;pointer-events:none}
+.pdfc::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:linear-gradient(90deg,var(--pa),var(--pb))}
+.pdfc:hover{transform:translateY(-7px);box-shadow:0 34px 70px -30px var(--pa)}
+.pdfc:hover::before{opacity:1;transform:scale(1.3)}
+.pdfc>*{position:relative}
+.pdf-no{position:absolute!important;right:1.1rem;top:.9rem;font-family:var(--display);font-weight:900;font-size:2.2rem;line-height:1;color:var(--pa);opacity:.16}
+.pdf-doc{position:relative;display:block;width:4rem;height:5.2rem;margin-bottom:.7rem;border-radius:6px 16px 6px 6px;overflow:hidden;
+  background:linear-gradient(160deg,#fff,color-mix(in srgb,var(--pb) 35%,#fff));box-shadow:0 16px 30px -12px var(--pa),inset 5px 0 0 var(--pa);animation:pfloat 4.5s ease-in-out infinite}
+.pdfc:nth-child(2n) .pdf-doc{animation-delay:-1.5s}.pdfc:nth-child(3n) .pdf-doc{animation-delay:-3s}
+@keyframes pfloat{50%{transform:translateY(-6px) rotate(-2deg)}}
+.pdf-doc .fold{position:absolute;right:0;top:0;width:1.1rem;height:1.1rem;background:linear-gradient(225deg,#0b0b14 50%,color-mix(in srgb,var(--pa) 70%,#fff) 50%)}
+.pdf-doc b{position:absolute;left:.7rem;top:.55rem;font-family:var(--display);font-weight:900;font-size:.7rem;letter-spacing:.08em;padding:1px 5px;border-radius:4px;color:#fff;background:linear-gradient(120deg,var(--pa),var(--pb))}
+.pdf-doc .ln{position:absolute;left:.8rem;right:.55rem;top:2.2rem;display:grid;gap:.42rem}
+.pdf-doc .ln u{display:block;height:3px;border-radius:2px;background:color-mix(in srgb,var(--pa) 45%,#9aa);opacity:.65}
+.pdf-doc .ln u:nth-child(2){width:80%}.pdf-doc .ln u:nth-child(3){width:90%}.pdf-doc .ln u:nth-child(4){width:55%}
+.pdf-doc .scan{position:absolute;left:0;right:0;height:14px;top:-14px;background:linear-gradient(transparent,color-mix(in srgb,var(--pb) 75%,transparent),transparent);animation:pscan 2.8s ease-in-out infinite}
+@keyframes pscan{0%{top:-14px}100%{top:100%}}
+.pdf-kind{font-family:var(--display);font-weight:700;font-size:.72rem;letter-spacing:.14em;color:var(--pa);overflow-wrap:anywhere}
+.pdf-t{font-size:1.25rem;font-weight:600;line-height:1.25;color:#fff;overflow-wrap:anywhere}
+.pdf-s{color:var(--pb);font-size:.85rem;overflow-wrap:anywhere}
+.pdf-d{color:var(--mute);font-size:.92rem;margin-top:.2rem}
+.pdf-foot{display:flex;align-items:center;justify-content:space-between;gap:.6rem;margin-top:auto;padding-top:.9rem}
+.sw{display:flex;gap:5px}
+.sw i{width:14px;height:14px;border-radius:50%;border:1px solid rgba(255,255,255,.35)}
+.sw i:nth-child(1){background:var(--pa)}.sw i:nth-child(2){background:var(--pb)}.sw i:nth-child(3){background:linear-gradient(135deg,var(--pa),var(--pb))}
+.pdf-open{font-weight:600;font-size:.88rem;padding:7px 15px;border-radius:999px;color:#08090f;background:linear-gradient(120deg,var(--pa),var(--pb));box-shadow:0 10px 26px -12px var(--pa);transition:transform .25s}
+.pdfc:hover .pdf-open{transform:translateX(3px)}
+@media (prefers-reduced-motion:reduce){.pdf-doc,.pdf-doc .scan{animation:none}.pdfc,.pdfc::before{transition:none}}
+.pdfs{grid-template-columns:repeat(auto-fit,minmax(min(100%,19.5rem),1fr))}
+
+/* PDF library gets its own section theme */
+.th-library{--a:#2fd8b0;--b:#ff9a3d;--c:#b8b3ff}
+.th-library .pdfs{margin-top:2.2rem}
+.th-library h2{background:linear-gradient(100deg,#fff,var(--a) 45%,var(--b));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.pgdrift{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.pgdrift i{position:absolute;bottom:-14vh;left:var(--x,10%);width:46px;height:60px;border-radius:4px 10px 4px 4px;opacity:0;
+  background:linear-gradient(160deg,rgba(255,255,255,.22),color-mix(in srgb,var(--a) 30%,transparent));border:1px solid color-mix(in srgb,var(--a) 50%,transparent);animation:pgup 14s linear infinite}
+.pgdrift i:nth-child(1){--x:6%}.pgdrift i:nth-child(2){--x:20%;animation-delay:-3s;width:36px;height:48px}.pgdrift i:nth-child(3){--x:38%;animation-delay:-6s}
+.pgdrift i:nth-child(4){--x:56%;animation-delay:-9s;width:40px;height:52px}.pgdrift i:nth-child(5){--x:72%;animation-delay:-2s}.pgdrift i:nth-child(6){--x:86%;animation-delay:-7s;width:34px;height:44px}.pgdrift i:nth-child(7){--x:94%;animation-delay:-11s}
+@keyframes pgup{0%{transform:translateY(0) rotate(-12deg);opacity:0}15%{opacity:.5}85%{opacity:.3}100%{transform:translateY(-120vh) rotate(18deg);opacity:0}}
+@media (prefers-reduced-motion:reduce){.pgdrift i{animation:none}}
+
+/* Jarvis */
+.th-jarvis{--a:#4df0ff;--b:#3b6bff;--c:#ffb347}
+.jv{width:min(100%,44rem);margin:2rem auto 0;display:grid;gap:1rem;justify-items:center;text-align:left}
+.jv-orb{position:relative;width:min(52vw,12rem);aspect-ratio:1;display:grid;place-items:center}
+.jv-orb .core{width:46%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,var(--a) 40%,var(--b) 80%);box-shadow:0 0 60px var(--a),0 0 120px color-mix(in srgb,var(--b) 70%,transparent);animation:breathe 4s ease-in-out infinite;transition:transform .3s}
+.jv-orb i{position:absolute;inset:0;border-radius:50%;border:1px solid var(--a);opacity:.5;animation:spin 14s linear infinite;border-top-color:transparent;border-bottom-color:var(--b)}
+.jv-orb .r2{inset:9%;animation-duration:9s;animation-direction:reverse;border-color:var(--b);border-top-color:transparent}
+.jv-orb .r3{inset:-9%;animation-duration:22s;border-style:dashed;opacity:.3}
+.jv-orb .bars{position:absolute;display:flex;gap:4px;align-items:center;height:22%;opacity:0;transition:opacity .3s}
+.jv-orb .bars u{width:4px;height:100%;border-radius:3px;background:#06101a;animation:eq .9s ease-in-out infinite}
+.jv-orb .bars u:nth-child(2n){animation-delay:-.3s}.jv-orb .bars u:nth-child(3n){animation-delay:-.6s}
+.jv[data-state="listening"] .core{transform:scale(1.18);background:radial-gradient(circle at 35% 30%,#fff,#ff6b78 45%,#ff4fa3 85%);box-shadow:0 0 70px #ff6b78}
+.jv[data-state="listening"] .r1,.jv[data-state="thinking"] .r1{animation-duration:2.2s}
+.jv[data-state="thinking"] .r2{animation-duration:1.4s}
+.jv[data-state="speaking"] .bars{opacity:1}
+.jv[data-state="speaking"] .core{transform:scale(1.1)}
+.jv-status{font-family:var(--display);font-weight:700;letter-spacing:.3em;font-size:.72rem;color:var(--a)}
+.jv-log{width:100%;max-height:19rem;overflow-y:auto;display:grid;gap:.6rem;padding:1rem;border-radius:22px;border:1px solid color-mix(in srgb,var(--a) 30%,transparent);background:linear-gradient(160deg,rgba(8,16,34,.78),rgba(5,6,13,.85));-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.jv-m{margin:0;padding:.65rem .9rem;border-radius:16px;max-width:88%;line-height:1.5;overflow-wrap:anywhere;white-space:pre-wrap}
+.jv-m.bot{justify-self:start;background:color-mix(in srgb,var(--a) 14%,transparent);border:1px solid color-mix(in srgb,var(--a) 30%,transparent)}
+.jv-m.me{justify-self:end;background:linear-gradient(120deg,var(--b),color-mix(in srgb,var(--a) 70%,var(--b)));color:#04101a;font-weight:500}
+.jv-m.err{justify-self:start;color:#ffb3ba;border:1px solid rgba(255,107,120,.4);background:rgba(255,107,120,.08)}
+.jv-bar{width:100%;display:flex;gap:.6rem;align-items:center}
+.jv-mic{flex:none;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;cursor:pointer;color:#04101a;border:0;background:linear-gradient(135deg,var(--a),var(--b));box-shadow:0 10px 28px -10px var(--a)}
+.jv-mic svg{width:22px;height:22px}
+.jv[data-state="listening"] .jv-mic{background:linear-gradient(135deg,#ff6b78,#ff4fa3);animation:breathe 1s ease-in-out infinite}
+.jv-in,.jv-krow input{flex:1;min-width:0;padding:13px 16px;border-radius:999px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--ink);font:inherit}
+.jv-in:focus,.jv-krow input:focus{outline:none;border-color:var(--a)}
+.jv-send{flex:none;padding:12px 22px;border-radius:999px;border:0;cursor:pointer;font:600 .95rem var(--body);color:#04101a;background:linear-gradient(120deg,var(--a),var(--b))}
+.jv-opts{width:100%;display:flex;flex-wrap:wrap;gap:.6rem 1.2rem;align-items:center;justify-content:center;color:var(--mute);font-size:.85rem}
+.jv-opts select{background:#0b1226;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:4px 8px;font:inherit}
+.jv-link{background:none;border:0;color:var(--a);cursor:pointer;font:inherit;font-size:.85rem;text-decoration:underline;text-underline-offset:3px}
+.jv-key{width:100%;padding:1rem;border-radius:18px;border:1px dashed color-mix(in srgb,var(--a) 40%,transparent);color:var(--mute);font-size:.88rem}
+.jv-key[hidden]{display:none}
+.jv-key p{margin:0 0 .7rem}
+.jv-krow{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+.jv-krow input{flex:1 1 12rem}
+@media (prefers-reduced-motion:reduce){.jv-orb *,.jv-mic{animation:none!important}}
+.jv-orb,.jv-orb *{pointer-events:none}.jv-bar,.jv-opts,.jv-key{position:relative;z-index:2}
+.jv{grid-template-columns:minmax(0,1fr);max-width:100%;min-width:0}
+.jv>*{min-width:0;max-width:100%}
+.jv-in{flex:1 1 0;min-width:0;width:100%}
+.jv-mic,.jv-send{flex:none}
+.jv-m{overflow-wrap:anywhere}
+.jv-opts select{max-width:100%}
+
+/* PDF covers: premium 3D covers instead of the small icon */
+.pdfc .stage3{display:grid;height:16.4rem;margin:-.4rem -.4rem .2rem;background:radial-gradient(60% 55% at 50% 52%,color-mix(in srgb,var(--cv2) 40%,transparent),transparent 72%)}
+.pdfc .bk{--w:8.7rem;--h:12.1rem;--d:1.7rem}
+.pdfc .bk .tt b{font-size:.9rem}
+.pdfc .bk .art{margin:.1rem 0}
+.pdfc:hover .sway{animation-play-state:paused}
+.bk .rib{position:absolute;top:.85rem;right:-1.75rem;transform:rotate(45deg);width:5.6rem;text-align:center;z-index:2;padding:2px 0;font-family:var(--display);font-weight:900;font-size:.52rem;letter-spacing:.16em;color:#08090f;background:linear-gradient(120deg,var(--pa),var(--pb));box-shadow:0 4px 10px rgba(0,0,0,.4)}
+.bk .seal{position:absolute;left:.65rem;top:2.1rem;z-index:2;display:grid;place-items:center;width:2.5rem;height:2.5rem;border-radius:50%;font-family:var(--display);font-weight:900;font-size:.62rem;line-height:1;color:#08090f;text-align:center;background:radial-gradient(circle at 30% 25%,#fff,var(--gold) 55%,color-mix(in srgb,var(--gold) 55%,#000));box-shadow:0 4px 12px rgba(0,0,0,.5)}
+.bk .seal small{display:block;font-size:.34rem;font-weight:700;letter-spacing:.06em}
+.bk .front>span{display:block}
+.pdfc .pdf-no{top:.7rem}
+/* thoughts */
+.th-thoughts{--a:#b79cff;--b:#ff8fb1;--c:#9ff0ff}
+.bub{position:absolute;inset:0;overflow:hidden;pointer-events:none}
+.bub i{position:absolute;bottom:-12vh;left:var(--x,10%);width:var(--s,60px);aspect-ratio:1;border-radius:50%;border:1px solid color-mix(in srgb,var(--a) 55%,transparent);background:radial-gradient(circle at 30% 28%,rgba(255,255,255,.22),color-mix(in srgb,var(--b) 14%,transparent) 60%,transparent);opacity:0;animation:bub 16s ease-in infinite}
+.bub i:nth-child(1){--x:8%;--s:46px}.bub i:nth-child(2){--x:24%;--s:78px;animation-delay:-4s}.bub i:nth-child(3){--x:44%;--s:38px;animation-delay:-8s}
+.bub i:nth-child(4){--x:62%;--s:64px;animation-delay:-2s}.bub i:nth-child(5){--x:80%;--s:50px;animation-delay:-11s}.bub i:nth-child(6){--x:92%;--s:70px;animation-delay:-6s}
+@keyframes bub{0%{transform:translateY(0) scale(.7);opacity:0}15%{opacity:.7}100%{transform:translateY(-115vh) scale(1.15);opacity:0}}
+.tq{position:relative;max-width:42rem;margin:1.8rem auto 0;padding:1.6rem 1.4rem;text-align:center;font-family:var(--brand);font-weight:300;font-size:clamp(1.25rem,3.6vw,2rem);line-height:1.35;border:0;
+  background:linear-gradient(100deg,#fff,var(--a) 40%,var(--b));-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.tq cite{display:block;margin-top:.9rem;font-family:var(--body);font-style:normal;font-size:.85rem;letter-spacing:.2em;-webkit-text-fill-color:var(--mute);color:var(--mute)}
+.tcards{margin-top:1.4rem}
+.tc{position:relative;overflow:hidden;display:block;text-decoration:none;color:inherit;text-align:left;border-color:color-mix(in srgb,var(--pa) 38%,transparent)!important;
+  background:linear-gradient(155deg,color-mix(in srgb,var(--pa) 16%,rgba(10,10,24,.86)),rgba(6,6,14,.88))!important;transition:transform .3s,box-shadow .3s}
+.tc::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:linear-gradient(90deg,var(--pa),var(--pb))}
+.tc:hover{transform:translateY(-6px);box-shadow:0 28px 60px -30px var(--pa)}
+.tc .kind{color:var(--pa)}.tc h3{color:#fff}
+.tc-i{position:absolute;right:1rem;top:.5rem;font-size:2.8rem;line-height:1;color:var(--pa);opacity:.25;animation:breathe 5s ease-in-out infinite}
+/* back to top */
+.totop{position:fixed;right:max(14px,3vw);bottom:calc(env(safe-area-inset-bottom,0px) + 64px);z-index:20;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;cursor:pointer;color:#06121a;border:0;
+  background:linear-gradient(135deg,var(--ga,#62d8ff),var(--gb,#ff4fa3));box-shadow:0 12px 30px -10px var(--ga,#62d8ff);opacity:0;transform:translateY(14px) scale(.9);pointer-events:none;transition:opacity .3s,transform .3s}
+.totop.show{opacity:1;transform:none;pointer-events:auto}
+.totop svg{width:20px;height:20px}
+@media (prefers-reduced-motion:reduce){.bub i,.tc-i{animation:none}.totop{transition:none}}
+.pdfc .sway,.pdfc .bk{display:block}.bk .au,.bk .imp,.bk .tt{display:block}.pdfc .stage3{place-items:end center}
+</style>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script>(function(){try{var h=document.head;if(h&&!h.querySelector('meta[name="viewport"]')){var m=document.createElement("meta");m.name="viewport";m.content="width=device-width,initial-scale=1,viewport-fit=cover";h.appendChild(m);}if(!matchMedia("(prefers-reduced-motion: reduce)").matches){var r=document.documentElement;r.classList.add("intro");setTimeout(function(){if(!window.__abxReady){r.classList.remove("intro");r.classList.add("go");}},6000);}}catch(e){}})();</script>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<linearGradient id="amg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#62d8ff"/><stop offset=".55" stop-color="#8c6cff"/><stop offset="1" stop-color="#ff4fa3"/></linearGradient></defs>
+<symbol id="abxMini" viewBox="0 0 200 200"><circle cx="100" cy="100" r="92" fill="none" stroke="url(#amg)" stroke-width="8" stroke-dasharray="130 26 50 26"/><path d="M62 144 L100 56 L138 144" fill="none" stroke="url(#amg)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/><path d="M80 118 H120" stroke="#ffb347" stroke-width="11" stroke-linecap="round"/><circle cx="100" cy="56" r="9" fill="#fff"/></symbol></svg>
+<div class="intro-ov" id="introOv">
+  <canvas id="boom" aria-hidden="true"></canvas>
+  <div class="io-flash"></div>
+  <div class="io-wave w1"></div><div class="io-wave w2"></div><div class="io-wave w3"></div>
+  <div class="io-stage">
+    <div class="io-logo"><svg class="logo" viewBox="0 0 200 200" role="img" aria-label="ABHYNEX logo">
+<defs>
+<linearGradient id="lgio" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#62d8ff"/><stop offset=".5" stop-color="#8c6cff"/><stop offset="1" stop-color="#ff4fa3"/></linearGradient>
+<linearGradient id="lhio" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb347"/><stop offset="1" stop-color="#ff4fa3"/></linearGradient>
+<radialGradient id="lcio"><stop offset="0" stop-color="#fff"/><stop offset=".4" stop-color="#9fe6ff"/><stop offset="1" stop-color="#62d8ff" stop-opacity="0"/></radialGradient>
+</defs>
+<g class="lr lr1"><circle cx="100" cy="100" r="94" fill="none" stroke="url(#lgio)" stroke-width="2.4" stroke-dasharray="120 28 40 28"/></g>
+<g class="lr lr2"><circle cx="100" cy="100" r="80" fill="none" stroke="url(#lhio)" stroke-width="1.4" stroke-dasharray="2 8"/><circle cx="100" cy="20" r="3.5" fill="#fff"/><circle cx="100" cy="180" r="2.5" fill="#ffb347"/></g>
+<g transform="rotate(-24 100 100)"><g class="lr lr3"><ellipse cx="100" cy="100" rx="70" ry="24" fill="none" stroke="url(#lgio)" stroke-width="1.6" stroke-opacity=".8"/><circle cx="170" cy="100" r="4.5" fill="#fff"/></g></g>
+<path d="M62 142 L100 56 L138 142" fill="none" stroke="url(#lgio)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M80 116 H120" stroke="url(#lhio)" stroke-width="7" stroke-linecap="round"/>
+<circle cx="100" cy="56" r="14" fill="url(#lcio)"/><circle cx="100" cy="56" r="4.5" fill="#fff"/>
+</svg></div>
+    <div class="io-word" aria-label="ABHYNEX"><i aria-hidden="true" style="--i:0;--lc:#ffffff">A</i><i aria-hidden="true" style="--i:1;--lc:#d9ecff">B</i><i aria-hidden="true" style="--i:2;--lc:#9fe6ff">H</i><i aria-hidden="true" style="--i:3;--lc:#62d8ff">Y</i><i aria-hidden="true" style="--i:4;--lc:#9b86ff">N</i><i aria-hidden="true" style="--i:5;--lc:#c27bff">E</i><i aria-hidden="true" style="--i:6;--lc:#ff7ac0">X</i></div>
+    <div class="io-sub">DIGITAL UNIVERSE</div>
+    <div class="io-brands" aria-hidden="true"><span class="b1">ABHI AI</span><span class="b2">ASTRA NEXUS AI</span><span class="b3">ABHYNEX SEARCH</span><span class="b4">ABHYNEX 24 HOURS</span></div>
+  </div>
+  <button class="io-skip" id="introSkip" type="button">Skip</button>
+</div>
+
+<canvas id="gl" aria-hidden="true"></canvas>
+<div class="wm-bg" aria-hidden="true"><svg class="logo" viewBox="0 0 200 200" role="img" aria-label="ABHYNEX logo">
+<defs>
+<linearGradient id="lgbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#62d8ff"/><stop offset=".5" stop-color="#8c6cff"/><stop offset="1" stop-color="#ff4fa3"/></linearGradient>
+<linearGradient id="lhbg" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb347"/><stop offset="1" stop-color="#ff4fa3"/></linearGradient>
+<radialGradient id="lcbg"><stop offset="0" stop-color="#fff"/><stop offset=".4" stop-color="#9fe6ff"/><stop offset="1" stop-color="#62d8ff" stop-opacity="0"/></radialGradient>
+</defs>
+<g class="lr lr1"><circle cx="100" cy="100" r="94" fill="none" stroke="url(#lgbg)" stroke-width="2.4" stroke-dasharray="120 28 40 28"/></g>
+<g class="lr lr2"><circle cx="100" cy="100" r="80" fill="none" stroke="url(#lhbg)" stroke-width="1.4" stroke-dasharray="2 8"/><circle cx="100" cy="20" r="3.5" fill="#fff"/><circle cx="100" cy="180" r="2.5" fill="#ffb347"/></g>
+<g transform="rotate(-24 100 100)"><g class="lr lr3"><ellipse cx="100" cy="100" rx="70" ry="24" fill="none" stroke="url(#lgbg)" stroke-width="1.6" stroke-opacity=".8"/><circle cx="170" cy="100" r="4.5" fill="#fff"/></g></g>
+<path d="M62 142 L100 56 L138 142" fill="none" stroke="url(#lgbg)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M80 116 H120" stroke="url(#lhbg)" stroke-width="7" stroke-linecap="round"/>
+<circle cx="100" cy="56" r="14" fill="url(#lcbg)"/><circle cx="100" cy="56" r="4.5" fill="#fff"/>
+</svg></div>
+<div class="prog" id="prog" aria-hidden="true"></div>
+<button class="totop" id="toTop" type="button" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+
+<nav class="nav" aria-label="Main">
+  <div class="nav-l"><a class="brand" href="#home" aria-label="ABHYNEX home"><span class="mark"><svg class="logo" viewBox="0 0 200 200" role="img" aria-label="ABHYNEX logo">
+<defs>
+<linearGradient id="lgnav" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#62d8ff"/><stop offset=".5" stop-color="#8c6cff"/><stop offset="1" stop-color="#ff4fa3"/></linearGradient>
+<linearGradient id="lhnav" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb347"/><stop offset="1" stop-color="#ff4fa3"/></linearGradient>
+<radialGradient id="lcnav"><stop offset="0" stop-color="#fff"/><stop offset=".4" stop-color="#9fe6ff"/><stop offset="1" stop-color="#62d8ff" stop-opacity="0"/></radialGradient>
+</defs>
+<g class="lr lr1"><circle cx="100" cy="100" r="94" fill="none" stroke="url(#lgnav)" stroke-width="2.4" stroke-dasharray="120 28 40 28"/></g>
+<g class="lr lr2"><circle cx="100" cy="100" r="80" fill="none" stroke="url(#lhnav)" stroke-width="1.4" stroke-dasharray="2 8"/><circle cx="100" cy="20" r="3.5" fill="#fff"/><circle cx="100" cy="180" r="2.5" fill="#ffb347"/></g>
+<g transform="rotate(-24 100 100)"><g class="lr lr3"><ellipse cx="100" cy="100" rx="70" ry="24" fill="none" stroke="url(#lgnav)" stroke-width="1.6" stroke-opacity=".8"/><circle cx="170" cy="100" r="4.5" fill="#fff"/></g></g>
+<path d="M62 142 L100 56 L138 142" fill="none" stroke="url(#lgnav)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M80 116 H120" stroke="url(#lhnav)" stroke-width="7" stroke-linecap="round"/>
+<circle cx="100" cy="56" r="14" fill="url(#lcnav)"/><circle cx="100" cy="56" r="4.5" fill="#fff"/>
+</svg></span><span class="t">ABHYNEX</span></a>
+    <button class="snd" id="sndBtn" type="button" aria-pressed="true" aria-label="Sound on or off" title="Sound"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path class="wv2" d="M15.5 8.5a5 5 0 0 1 0 7"/><path class="wv2" d="M18.5 5.5a9 9 0 0 1 0 13"/><path class="sl" d="m16 9 6 6M22 9l-6 6"/></svg></button></div>
+  <div class="pill" id="pill">
+    <a href="#home">Home</a><a href="#ai">AI</a><a href="#jarvis">Jarvis</a><a href="#live">Live</a><a href="#farm">Farm</a><a href="#books">Books</a><a href="#library">PDFs</a><a href="#author">Author</a><a href="#skills">Skills</a><a href="#education">Education</a><a href="#journey">Journey</a><a href="#thoughts">Thoughts</a><a href="#about">About</a><a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<main>
+  <section class="scene wrap hero th-home" id="home" data-shape="0" data-shift="1" data-zoom="6">
+    <div class="col">
+      <div class="sb" aria-hidden="true"><svg viewBox="0 0 200 200"><use href="#abxMini"/></svg><b>ABHYNEX</b><i>·</i><span>DIGITAL UNIVERSE</span></div>
+      <div class="who a1">ABHISHEK SANJAY CHENDAKE · DIGITAL CREATOR · AI · TECHNOLOGY</div>
+      <h1 class="wordmark">ABHYNEX</h1>
+      <div class="lockup a2">✦ DIGITAL UNIVERSE</div>
+      <p class="lede a3">A personal digital universe built around Artificial Intelligence, technology, engineering, writing, creativity and continuous learning.</p>
+      <div class="row a3">
+        <a class="btn go" href="#ai">Explore AI</a>
+        <a class="btn" href="#live">Live updates</a>
+        <a class="btn" href="#about">Discover more</a>
+      </div>
+      <div class="pts a4">
+        <div class="pt"><b>ABX</b><span>Create • Explore • Evolve</span></div>
+        <div class="pt"><b>AI</b><span>Intelligent Systems</span></div>
+        <div class="pt"><b>CREATE</b><span>Ideas → Reality</span></div>
+        <div class="pt"><b>LEARN</b><span>Always Evolving</span></div>
+      </div>
+    </div>
+    <a class="cue" href="#ai" aria-label="Scroll to explore"><span></span>Scroll to explore</a>
+  </section>
+
+  <section class="scene wrap th-ai" id="ai" data-shape="1" data-shift="0" data-zoom="5.4">
+    <div class="col lg">
+      <div class="sb" aria-hidden="true"><svg viewBox="0 0 200 200"><use href="#abxMini"/></svg><b>ABHYNEX</b><i>·</i><span>AI UNIVERSE</span></div>
+      <div class="label">ARTIFICIAL INTELLIGENCE</div>
+      <h2>My AI Universe</h2>
+      <p class="lede">Exploring intelligent systems, creative technology and the future of digital interaction through independent AI projects.</p>
+    </div>
+    <div class="brands">
+      <article class="brand-panel bp-abhi">
+        <div class="bp-info">
+          <div class="bp-kind">PERSONAL AI ASSISTANT</div>
+          <div class="wm wm-abhi">Abhi <b>AI</b></div>
+          <p class="bp-tag">Smart chat. Everyday intelligence.</p>
+          <p>A personal AI assistant designed for intelligent conversations, information, learning and everyday digital assistance.</p>
+          <div class="tags"><i>AI Assistant</i><i>Smart Chat</i><i>Information</i><i>Multilingual</i></div>
+          <a class="bp-btn" href="https://abhi29.lovable.app/c/lja1wxb5mujermt9" target="_blank" rel="noopener">Open Abhi AI</a>
+        </div>
+        <div class="bp-em">
+          <div class="em em-abhi" aria-hidden="true">
+            <span class="ring"></span><span class="ring r2"></span>
+            <div class="orb"><div class="bars"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="brand-panel rev bp-astra">
+        <div class="bp-info">
+          <div class="bp-kind">EXPERIMENTAL AI PLATFORM</div>
+          <div class="wm wm-astra">Astra Nexus<small>ARTIFICIAL INTELLIGENCE</small></div>
+          <p class="bp-tag">An experimental AI universe.</p>
+          <p>An experimental AI universe focused on advanced digital experiences, intelligent interaction and next-generation ideas.</p>
+          <div class="tags"><i>AI System</i><i>Digital Future</i><i>Creative Tech</i><i>Innovation</i></div>
+          <a class="bp-btn" href="https://astra-nexus-cosmos.lovable.app" target="_blank" rel="noopener">Open Astra Nexus</a>
+        </div>
+        <div class="bp-em">
+          <svg class="em em-astra" viewBox="0 0 200 200" aria-hidden="true">
+            <defs>
+              <linearGradient id="astraG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a58bff"/><stop offset="1" stop-color="#ff4fa3"/></linearGradient>
+              <radialGradient id="astraC"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#c7b8ff"/><stop offset="1" stop-color="#8c6cff" stop-opacity="0"/></radialGradient>
+            </defs>
+            <circle class="core-glow" cx="100" cy="100" r="34" fill="url(#astraC)"/>
+            <circle cx="100" cy="100" r="9" fill="#fff"/>
+            <g transform="rotate(-28 100 100)"><g class="spin s1"><ellipse cx="100" cy="100" rx="86" ry="30" fill="none" stroke="url(#astraG)" stroke-width="1.2" stroke-opacity=".75"/><circle cx="186" cy="100" r="5" fill="#fff"/><circle cx="14" cy="100" r="3" fill="#a58bff"/></g></g>
+            <g transform="rotate(32 100 100)"><g class="spin s2"><ellipse cx="100" cy="100" rx="70" ry="44" fill="none" stroke="url(#astraG)" stroke-width="1" stroke-opacity=".55"/><circle cx="170" cy="100" r="4" fill="#ff4fa3"/><circle cx="30" cy="100" r="3" fill="#fff"/></g></g>
+            <g transform="rotate(88 100 100)"><g class="spin s3"><ellipse cx="100" cy="100" rx="52" ry="52" fill="none" stroke="url(#astraG)" stroke-width="1" stroke-dasharray="3 6" stroke-opacity=".7"/><circle cx="152" cy="100" r="3.5" fill="#c7b8ff"/></g></g>
+            <circle class="tw t1" cx="28" cy="38" r="1.6" fill="#fff"/><circle class="tw t2" cx="172" cy="30" r="1.4" fill="#fff"/><circle class="tw t3" cx="176" cy="162" r="1.8" fill="#fff"/><circle class="tw t1" cx="24" cy="164" r="1.4" fill="#fff"/>
+          </svg>
+        </div>
+      </article>
+    </div>
+    <div class="strap">BUILDING IDEAS • EXPLORING TECHNOLOGY • CREATING THE FUTURE</div>
+  </section>
+
+    <section class="scene wrap mid th-jarvis" id="jarvis" data-shape="1" data-shift="0" data-zoom="5.6">
+    <div class="col lg">
+      <div class="sb" aria-hidden="true"><svg viewBox="0 0 200 200"><use href="#abxMini"/></svg><b>ABHYNEX</b><i>·</i><span>JARVIS</span></div>
+      <div class="label">VOICE AI ASSISTANT • POWERED BY GEMINI</div>
+      <h2>Talk to Jarvis</h2>
+      <p class="lede">बोला किंवा लिहा — मराठी, हिंदी किंवा English मध्ये. Jarvis तुम्हाला उत्तर देईल आणि बोलून दाखवेल.</p>
+    </div>
+    <div class="jv" id="jv" data-state="idle">
+      <div class="jv-orb" aria-hidden="true"><i class="r1"></i><i class="r2"></i><i class="r3"></i><span class="core"></span><div class="bars"><u></u><u></u><u></u><u></u><u></u><u></u><u></u></div></div>
+      <div class="jv-status" id="jvStatus">READY</div>
+      <div class="jv-log" id="jvLog" aria-live="polite"><p class="jv-m bot">नमस्कार! मी Jarvis आहे, ABHYNEX चा AI assistant. मला काहीही विचारा.</p></div>
+      <div class="jv-bar">
+        <button class="jv-mic" id="jvMic" type="button" aria-label="Speak"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+        <input class="jv-in" id="jvIn" type="text" placeholder="Jarvis ला विचारा…" autocomplete="off" aria-label="Message to Jarvis">
+        <button class="jv-send" id="jvSend" type="button">Send</button>
+      </div>
+      <div class="jv-opts">
+        <label>Language <select id="jvLang"><option value="mr-IN">मराठी</option><option value="hi-IN">हिंदी</option><option value="en-IN">English</option></select></label>
+        <label><input type="checkbox" id="jvSpeak" checked> Speak replies</label>
+        <button class="jv-link" id="jvKeyBtn" type="button">Gemini key</button>
+      </div>
+      <div class="jv-key" id="jvKey" hidden>
+        <p>तुमची Gemini API key फक्त या browser मध्ये साठवली जाते. ती site मध्ये कुठेही लिहिलेली नसते आणि इतर कोणाला दिसत नाही.</p>
+        <div class="jv-krow"><input id="jvKeyIn" type="password" placeholder="Paste Gemini API key" autocomplete="off" aria-label="Gemini API key"><button class="jv-send" id="jvKeySave" type="button">Save</button><button class="jv-link" id="jvKeyClear" type="button">Remove</button></div>
+      </div>
+    </div>
+  </section>
+
+<section class="scene wrap th-live" id="live" data-shape="2" data-shift="0" data-zoom="5.2">
+    <div class="col lg">
+      <div class="sb" aria-hidden="true"><svg viewBox="0 0 200 200"><use href="#abxMini"/></svg><b>ABHYNEX</b><i>·</i><span>LIVE</span></div>
+      <div class="live-dot"><i></i>LIVE 24/7</div>
+      <h2>ABHYNEX Live</h2>
+      <p class="lede">The time in Solapur, the weather, quakes around the world and top tech stories. This board refreshes by itself.</p>
+    </div>
+
+    <div class="board">
+      <article class="glass bd">
+        <div class="kind">TIME · SOLAPUR (IST)</div>
+        <time class="big" id="bigClock">--:--:--</time>
+        <div class="greet" id="greet">&nbsp;</div>
+        <p class="dt" id="dateMr">&nbsp;</p>
+        <p class="dt" id="dateEn">&nbsp;</p>
+        <div class="daybar" aria-hidden="true"><i id="dayBar"></i></div>
+        <div class="up" id="dayTxt">&nbsp;</div>
+      </article>
+      <article class="glass bd">
+        <div class="kind">WEATHER · SOLAPUR</div>
+        <div class="wx-temp" id="wxTemp">--</div>
+        <div class="greet" id="wxDesc">Loading…</div>
+        <p class="dt" id="wxMeta">&nbsp;</p>
+        <div class="up" id="wxUp">&nbsp;</div>
+      </article>
+      <article class="glass bd">
+        <div class="kind">EARTHQUAKES · WORLD</div>
+        <div class="greet" id="eqHead">Loading…</div>
+        <ul id="eqList"></ul>
+        <div class="up" id="eqUp">&nbsp;</div>
+      </article>
+      <article class="glass bd">
+        <div class="kind">TECH STORIES · NOW</div>
+        <div class="greet" id="hnHead">Loading…</div>
+        <ul id="hnList"></ul>
+        <div class="up" id="hnUp">&nbsp;</div>
+      </article>
+    </div>
+
+    <div class="brands">
+      <article class="brand-panel bp-search">
+        <div class="bp-info">
+          <div class="bp-kind">LIVE SEARCH ENGINE</div>
+          <div class="wm wm-search">ABHYNEX<small>SEARCH</small></div>
+          <p class="bp-tag">Live web results with cited AI answers.</p>
+          <p>One search across the web, news, images and videos. Every AI answer comes with the sources behind it.</p>
+          <div class="tags"><i>Live Web</i><i>Cited Answers</i><i>News</i><i>Images</i><i>Videos</i></div>
+          <a class="bp-btn" href="https://abhynexen.lovable.app/search?q=hello&amp;tab=all" target="_blank" rel="noopener">Open ABHYNEX Search</a>
+        </div>
+        <div class="bp-em">
+          <div class="em em-search" aria-hidden="true">
+            <div class="lens"><span class="sweep"></span><b class="blip b1"></b><b class="blip b2"></b><b class="blip b3"></b></div>
+            <span class="handle"></span>
+            <div class="res"><i></i><i></i><i></i></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="brand-panel rev bp-h24">
+        <div class="bp-info">
+          <div class="bp-kind">WORLD LIVE UPDATES</div>
+          <div class="wm wm-24"><span class="pre">ABHYNEX</span><span class="n">24</span><span class="u">HOURS</span></div>
+          <p class="bp-tag">The world, live. Every hour.</p>
+          <p>Round-the-clock updates from around the globe, from morning in Solapur to midnight in New York.</p>
+          <div class="tags"><i>Live</i><i>World</i><i>News</i><i>24/7</i></div>
+          <div class="clocks" id="clocks" aria-label="World clock"></div>
+          <a class="bp-btn" href="https://chat.z.ai/s/928f0c6d-2b46-406d-9e73-c8c49303a82c" target="_blank" rel="noopener">Open 24 Hours</a>
+        </div>
+        <div class="bp-em">
+          <svg class="em em-24" viewBox="0 0 200 200" aria-hidden="true">
+            <defs><linearGradient id="h24G" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5a6a"/><stop offset="1" stop-color="#ffb347"/></linearGradient></defs>
+            <circle class="pulse" cx="100" cy="100" r="90" fill="none" stroke="#ff5a6a" stroke-width="1.5"/>
+            <circle class="pulse p2" cx="100" cy="100" r="90" fill="none" stroke="#ffb347" stroke-width="1.5"/>
+            <circle cx="100" cy="100" r="92" fill="rgba(255,90,106,.07)" stroke="url(#h24G)" stroke-width="1.6"/>
+            <circle class="dash" cx="100" cy="100" r="46" fill="none" stroke="rgba(255,179,71,.5)" stroke-width="1" stroke-dasharray="2 7"/>
+            <g id="ticks24"></g>
+            <g class="hand" id="hand24"><line x1="100" y1="100" x2="100" y2="30" stroke="url(#h24G)" stroke-width="3" stroke-linecap="round"/><circle cx="100" cy="28" r="5.5" fill="#fff"/></g>
+            <circle cx="100" cy="100" r="6" fill="#fff"/>
+            <text class="n24" x="100" y="141" text-anchor="middle">24</text>
+          </svg>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="scene wrap th-farm" id="farm" data-shape="3" data-shift="0" data-zoom="5.6">
+    <div class="col lg">
+      <div class="sb" aria-hidden="true"><svg viewBox="0 0 200 200"><use href="#abxMini"/></svg><b>ABHYNEX</b><i>·</i><span>FARMERS</span></div>
+      <div class="label">शेती · FARMING</div>
+      <h2>Chendake Farmers</h2>
+      <p class="lede">आधुनिक शेती मार्गदर्शन. Modern farming guidance for farmers.</p>
+    </div>
+    <div class="brands">
+      <article class="brand-panel bp-farm">
+        <div class="bp-info">
+          <div class="bp-kind">आधुनिक शेती मार्गदर्शन</div>
+          <div class="wm wm-farm">Chendake Farmers<small>BDL</small></div>
+          <p class="bp-tag">Modern farming guidance.</p>
+          <p>Chendake Farmers BDL shares modern farming guidance for farmers.</p>
+          <div class="tags"><i>शेती</i><i>Guidance</i><i>Modern farming</i></div>
+          <a class="bp-btn" href="https://share.google/lq4TKW043VFlQrhnV" target="_blank" rel="noopener">Open Chendake Farmers</a>
+        </div>
+        <div class="bp-em">
+          <svg class="em em-farm" viewBox="0 0 200 200" aria-hidden="true">
+            <defs>
+              <linearGradient id="fgS" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0f5a33"/><stop offset="1" stop-color="#06281a"/></linearGradient>
+              <radialGradient id="fgSun"><stop offset="0" stop-color="#fff6c8"/><stop offset=".5" stop-color="#ffd45a"/><stop offset="1" stop-color="#ffb347"/></radialGradient>
+            </defs>
+            <g class="rays" stroke="#ffd45a" stroke-width="2" stroke-linecap="round" opacity=".8">
+              <line x1="150" y1="14" x2="150" y2="22"/><line x1="150" y1="66" x2="150" y2="74"/><line x1="120" y1="44" x2="128" y2="44"/><line x1="172" y1="44" x2="180" y2="44"/>
+              <line x1="129" y1="23" x2="135" y2="29"/><line x1="165" y1="59" x2="171" y2="65"/><line x1="171" y1="23" x2="165" y2="29"/><line x1="135" y1="59" x2="129" y2="65"/>
+            </g>
+            <circle cx="150" cy="44" r="19" fill="url(#fgSun)"/>
+            <path d="M0 150 Q50 132 100 148 T200 142 V200 H0Z" fill="url(#fgS)"/>
+            <g fill="none" stroke="rgba(198,255,90,.35)" stroke-width="1.2"><path d="M0 164 Q50 148 100 162 T200 156"/><path d="M0 178 Q50 162 100 176 T200 170"/><path d="M0 192 Q50 176 100 190 T200 184"/></g>
+            <g class="plant p1" transform="translate(52 152)"><g class="sway">
+              <path class="stem" d="M0 0 C0 -22 -2 -40 0 -58"/>
+              <ellipse class="leaf" cx="-9" cy="-30" rx="9" ry="4" transform="rotate(-30 -9 -30)"/><ellipse class="leaf" cx="9" cy="-42" rx="9" ry="4" transform="rotate(30 9 -42)"/>
+              <ellipse class="bud" cx="0" cy="-62" rx="4" ry="6"/>
+            </g></g>
+            <g class="plant p2" transform="translate(100 152)"><g class="sway">
+              <path class="stem" d="M0 0 C0 -28 2 -52 0 -76"/>
+              <ellipse class="leaf" cx="-11" cy="-36" rx="11" ry="4.5" transform="rotate(-30 -11 -36)"/><ellipse class="leaf" cx="11" cy="-52" rx="11" ry="4.5" transform="rotate(30 11 -52)"/>
+              <ellipse class="bud" cx="0" cy="-81" rx="5" ry="7"/>
+            </g></g>
+            <g class="plant p3" transform="translate(148 152)"><g class="sway">
+              <path class="stem" d="M0 0 C0 -20 -2 -36 0 -50"/>
+              <ellipse class="leaf" cx="-8" cy="-26" rx="8" ry="3.5" transform="rotate(-30 -8 -26)"/><ellipse class="leaf" cx="8" cy="-38" rx="8" ry="3.5" transform="rotate(30 8 -38)"/>
+              <ellipse class="bud" cx="0" cy="-54" rx="4" ry="5.5"/>
+            </g></g>
+          </svg>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section class="scene wrap mid th-books" id="books" data-shape="4" data-shift="0" data-zoom="6.8">
+    <div class="dust" id="dust" aria-hidden="true"></div>
+    <div class="col">
+      <div class="sb" aria-hidden="true"><svg viewBox="0 0 200 200"><use href="#abxMini"/></svg><b>ABHYNEX</b><i>·</i><span>BOOKS</span></div>
+      <div class="label">AUTHOR • BOOKS • IDEAS</div>
+      <h2>My Books</h2>
+      <p class="lede">विचार, अनुभव आणि कल्पनांना शब्दांमध्ये रूप देऊन तयार केलेला माझा लेखनप्रवास — तीन वेगवेगळ्या पुस्तकांमधून.</p>
+    </div>
+    <div class="shelf">
+      <article class="glass bookcard bk-1">
+        <div class="stage3"><div class="sway"><div class="bk">
+          <div class="f front"><div><div class="au">ABHISHEK CHENDAKE</div><svg class="art" viewBox="0 0 100 60" aria-hidden="true"><circle cx="76" cy="15" r="7" fill="none" stroke="currentColor" stroke-width="1.4"/><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path class="wv" d="M-25 28q12.5-12 25 0t25 0 25 0 25 0 25 0 25 0" opacity=".95"/><path class="wv" d="M-25 38q12.5-12 25 0t25 0 25 0 25 0 25 0 25 0" opacity=".65"/><path class="wv" d="M-25 48q12.5-12 25 0t25 0 25 0 25 0 25 0 25 0" opacity=".35"/></g></svg></div><div><div class="tt"><b>विचारांचं महासागर</b><small>The Ocean of Thoughts</small></div><div class="imp">ABHYNEX</div></div></div>
+          <div class="f back"></div><div class="f spine"><span>OCEAN OF THOUGHTS · ABHYNEX</span></div><div class="f pgs"></div><div class="f top"></div><div class="f bot"></div>
+        </div></div></div>
+        <div class="kind">01 · MARATHI • PHILOSOPHY</div>
+        <p>महान व्यक्तींच्या विचारांमधून जीवन, संघर्ष, धैर्य, आत्मविश्वास आणि स्वतःचा शोध समजून घेण्याचा एक विचारप्रवर्तक प्रवास.</p>
+        <p class="en">The Ocean of Thoughts explores human thoughts and emotions.</p>
+        <div class="tags"><i>विचार</i><i>जीवन</i><i>महापुरुष</i></div>
+        <a class="btn" href="https://a.co/d/02rTWJzM" target="_blank" rel="noopener">View book</a>
+      </article>
+      <article class="glass bookcard bk-2">
+        <div class="stage3"><div class="sway"><div class="bk">
+          <div class="f front"><div><div class="au">ABHISHEK CHENDAKE</div><svg class="art" viewBox="0 0 100 60" aria-hidden="true"><circle cx="50" cy="30" r="25" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3"/><circle cx="50" cy="30" r="18" fill="none" stroke="currentColor" stroke-width="1"/><g class="nd" fill="currentColor"><path d="M50 8 55 30 50 52 45 30Z" opacity=".95"/><path d="M28 30 50 25 72 30 50 35Z" opacity=".55"/></g><circle class="st" cx="50" cy="30" r="2.6" fill="#fff"/></svg></div><div><div class="tt"><b>अज्ञांताचा शोध</b><small>The Search for the Unknown</small></div><div class="imp">ABHYNEX</div></div></div>
+          <div class="f back"></div><div class="f spine"><span>SEARCH FOR THE UNKNOWN · ABHYNEX</span></div><div class="f pgs"></div><div class="f top"></div><div class="f bot"></div>
+        </div></div></div>
+        <div class="kind">02 · MARATHI • DISCOVERY</div>
+        <p>ज्ञाताच्या पलीकडे असलेल्या प्रश्नांकडे, विचारांकडे आणि जीवनातील अज्ञात शक्यतांकडे पाहण्याचा एक वेगळा बौद्धिक प्रवास.</p>
+        <p class="en">The Search for the Unknown examines existence, truth and reality.</p>
+        <div class="tags"><i>शोध</i><i>विचार</i><i>अनुभव</i></div>
+        <a class="btn" href="https://read.amazon.co.uk/kp/embed/?asin=B0HK5187XN" target="_blank" rel="noopener">Read on Kindle</a>
+      </article>
+      <article class="glass bookcard bk-3">
+        <div class="stage3"><div class="sway"><div class="bk">
+          <div class="f front"><div><div class="au">ABHISHEK CHENDAKE</div><svg class="art" viewBox="0 0 100 60" aria-hidden="true"><path d="M8 54h22V42h22V30h22V18h20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><g fill="currentColor" opacity=".35"><rect x="8" y="42" width="22" height="12"/><rect x="30" y="30" width="22" height="24"/><rect x="52" y="18" width="22" height="36"/></g><path class="st" d="M88 6l2 5 5 .6-4 3.4 1.2 5L88 17.4 83.800 20l1.200-5-4-3.400 5-.6z" fill="#fff"/></svg></div><div><div class="tt"><b>The Better Version of You</b><small>English · Self-growth</small></div><div class="imp">ABHYNEX</div></div></div>
+          <div class="f back"></div><div class="f spine"><span>BETTER VERSION OF YOU · ABHYNEX</span></div><div class="f pgs"></div><div class="f top"></div><div class="f bot"></div>
+        </div></div></div>
+        <div class="kind">03 · ENGLISH • SELF GROWTH</div>
+        <p>Growth, self-awareness, discipline and continuous improvement यांचा शोध घेणारा एक प्रेरणादायी self-development journey.</p>
+        <p class="en">The Better Version of You focuses on self-discovery and personal growth.</p>
+        <div class="tags"><i>Growth Mindset</i><i>Self-Improvement</i></div>
+        <a class="btn" href="https://read.amazon.com/kp/embed/?asin=B0HK8QHT4X" target="_blank" rel="noopener">Read on Kindle</a>
+      </article>
+    </div>
+        <div class="strap" style="text-align:center">IDEAS → WORDS → BOOKS → IMPACT</div>
+  </section>
+
+  <section class="scene wrap mid th-library" id="library" data-shape="4" data-shift="0" data-zoom="6.6">
+    <div class="pgdrift" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="col">
+      <div class="sb" aria-hidden="true"><svg viewBox="0 0 200 200"><use href="#abxMini"/></svg><b>ABHYNEX</b><i>·</i><span>PDF LIBRARY</span></div>
+      <div class="label">READ ONLINE • ABX LIBRARY</div>
+    <h2>PDF Library</h2>
+      <p class="lede">माझी पुस्तकं PDF स्वरूपात — उघडा आणि थेट वाचा.</p>
+</div>
+    <div class="pdfs">
+      <a class="pdfc" style="--pa:#3a78e8;--pb:#62d8ff" href="https://abhishekchendake.wordpress.com/wp-content/uploads/2026/09/untitled-document-16.pdf" target="_blank" rel="noopener" aria-label="Open PDF: The Ocean of Thoughts">
+        <span class="pdf-no">01</span>
+        <span class="stage3" aria-hidden="true" style="--cv:#12306d;--cv2:#3a78e8;--gold:#f1c76b"><span class="sway"><span class="bk">
+          <span class="f front"><span class="rib">PDF</span><span><span class="au">ABHISHEK CHENDAKE</span><svg class="art" viewBox="0 0 100 60" aria-hidden="true"><circle cx="76" cy="15" r="7" fill="none" stroke="currentColor" stroke-width="1.4"/><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path class="wv" d="M-25 28q12.5-12 25 0t25 0 25 0 25 0 25 0 25 0"/><path class="wv" d="M-25 38q12.5-12 25 0t25 0 25 0 25 0 25 0 25 0" opacity=".65"/><path class="wv" d="M-25 48q12.5-12 25 0t25 0 25 0 25 0 25 0 25 0" opacity=".35"/></g></svg></span><span><span class="tt"><b>विचारांचा महासागर</b><small>The Ocean of Thoughts</small></span><span class="imp">ABHYNEX</span></span></span>
+          <span class="f back"></span><span class="f spine"><span>विचारांचा महासागर · ABHYNEX</span></span><span class="f pgs"></span><span class="f top"></span><span class="f bot"></span>
+        </span></span></span>
+        <span class="pdf-kind">Marathi · Philosophy</span>
+        <span class="pdf-t">विचारांचा महासागर</span><span class="pdf-s">The Ocean of Thoughts</span>
+        <span class="pdf-d">Reflections on thoughts, life and courage.</span>
+        <span class="pdf-foot"><span class="sw" aria-hidden="true"><i></i><i></i><i></i></span><span class="pdf-open">Open PDF ↗</span></span>
+      </a>
+      <a class="pdfc" style="--pa:#9b5cf0;--pb:#ff4fa3" href="https://abhishekchendake.wordpress.com/wp-content/uploads/2026/09/untitled-document-29.pdf" target="_blank" rel="noopener" aria-label="Open PDF: The Search for the Unknown">
+        <span class="pdf-no">02</span>
+        <span class="stage3" aria-hidden="true" style="--cv:#3b1458;--cv2:#9b5cf0;--gold:#f1c76b"><span class="sway"><span class="bk">
+          <span class="f front"><span class="rib">PDF</span><span><span class="au">ABHISHEK CHENDAKE</span><svg class="art" viewBox="0 0 100 60" aria-hidden="true"><circle cx="50" cy="30" r="25" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 3"/><circle cx="50" cy="30" r="18" fill="none" stroke="currentColor" stroke-width="1"/><g class="nd" fill="currentColor"><path d="M50 8 55 30 50 52 45 30Z" opacity=".95"/><path d="M28 30 50 25 72 30 50 35Z" opacity=".55"/></g><circle class="st" cx="50" cy="30" r="2.6" fill="#fff"/></svg></span><span><span class="tt"><b>अज्ञाताचा शोध</b><small>The Search for the Unknown</small></span><span class="imp">ABHYNEX</span></span></span>
+          <span class="f back"></span><span class="f spine"><span>अज्ञाताचा शोध · ABHYNEX</span></span><span class="f pgs"></span><span class="f top"></span><span class="f bot"></span>
+        </span></span></span>
+        <span class="pdf-kind">Marathi · Discovery</span>
+        <span class="pdf-t">अज्ञाताचा शोध</span><span class="pdf-s">The Search for the Unknown</span>
+        <span class="pdf-d">Existence, truth and reality beyond the known.</span>
+        <span class="pdf-foot"><span class="sw" aria-hidden="true"><i></i><i></i><i></i></span><span class="pdf-open">Open PDF ↗</span></span>
+      </a>
+      <a class="pdfc" style="--pa:#ff6f8f;--pb:#ffb347" href="https://abhishekchendake.wordpress.com/wp-content/uploads/2026/09/untitled-document-32.pdf" target="_blank" rel="noopener" aria-label="Open PDF: Self-growth · English">
+        <span class="pdf-no">03</span>
+        <span class="stage3" aria-hidden="true" style="--cv:#6b1f3d;--cv2:#ff6f8f;--gold:#f1c76b"><span class="sway"><span class="bk">
+          <span class="f front"><span class="rib">PDF</span><span><span class="au">ABHISHEK CHENDAKE</span><svg class="art" viewBox="0 0 100 60" aria-hidden="true"><path d="M8 54h22V42h22V30h22V18h20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><g fill="currentColor" opacity=".35"><rect x="8" y="42" width="22" height="12"/><rect x="30" y="30" width="22" height="24"/><rect x="52" y="18" width="22" height="36"/></g><circle class="st" cx="88" cy="9" r="3" fill="#fff"/></svg></span><span><span class="tt"><b>The Better Version of You</b><small>Self-growth · English</small></span><span class="imp">ABHYNEX</span></span></span>
+          <span class="f back"></span><span class="f spine"><span>THE BETTER VERSION OF YOU · ABHYNEX</span></span><span class="f pgs"></span><span class="f top"></span><span class="f bot"></span>
+        </span></span></span>
+        <span class="pdf-kind">English · Self Growth</span>
+        <span class="pdf-t">The Better Version of You</span><span class="pdf-s">Self-growth · English</span>
+        <span class="pdf-d">Discipline, mindset and continuous improvement.</span>
+        <span class="pdf-foot"><span class="sw" aria-hidden="true"><i></i><i></i><i></i></span><span class="pdf-open">Open PDF ↗</span></span>
+      </a>
+      <a class="pdfc" style="--pa:#2fd8b0;--pb:#7dffd1" href="https://abhishekchendake.wordpress.com/wp-content/uploads/2026/09/the_architecture_of_meaning_320_pages.pdf" target="_blank" rel="noopener" aria-label="Open PDF: How meaning is built, layer by layer">
+        <span class="pdf-no">04</span>
+        <span class="stage3" aria-hidden="true" style="--cv:#07423a;--cv2:#2fd8b0;--gold:#c9fbe9"><span class="sway"><span class="bk">
+          <span class="f front"><span class="rib">PDF</span><span class="seal">320<small>pages</small></span><span><span class="au">ABHISHEK CHENDAKE</span><svg class="art" viewBox="0 0 100 60" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 54V32a12 12 0 0 1 24 0v22M36 54V32a12 12 0 0 1 24 0v22M60 54V32a12 12 0 0 1 24 0v22"/><path d="M6 54h88" stroke-width="2.2"/><path d="M24 20V8M48 20V4M72 20V8" opacity=".5" stroke-dasharray="2 3"/></g><circle class="st" cx="48" cy="4" r="2.6" fill="#fff"/></svg></span><span><span class="tt"><b>The Architecture of Meaning</b><small>How meaning is built, layer by layer</small></span><span class="imp">ABHYNEX</span></span></span>
+          <span class="f back"></span><span class="f spine"><span>THE ARCHITECTURE OF MEANIN · ABHYNEX</span></span><span class="f pgs"></span><span class="f top"></span><span class="f bot"></span>
+        </span></span></span>
+        <span class="pdf-kind">English · Philosophy · 320 pages</span>
+        <span class="pdf-t">The Architecture of Meaning</span><span class="pdf-s">How meaning is built, layer by layer</span>
+        <span class="pdf-d">A long-form exploration of how meaning is constructed.</span>
+        <span class="pdf-foot"><span class="sw" aria-hidden="true"><i></i><i></i><i></i></span><span class="pdf-open">Open PDF ↗</span></span>
+      </a>
+      <a class="pdfc" style="--pa:#ff9a3d;--pb:#ffd27a" href="https://abhishekchendake.wordpress.com/wp-content/uploads/2026/09/the_philosophy_of_becoming_450_pages.pdf" target="_blank" rel="noopener" aria-label="Open PDF: Who we are while we change">
+        <span class="pdf-no">05</span>
+        <span class="stage3" aria-hidden="true" style="--cv:#5a2a07;--cv2:#ff9a3d;--gold:#ffe0a3"><span class="sway"><span class="bk">
+          <span class="f front"><span class="rib">PDF</span><span class="seal">450<small>pages</small></span><span><span class="au">ABHISHEK CHENDAKE</span><svg class="art" viewBox="0 0 100 60" aria-hidden="true"><g class="nd" fill="none" stroke="currentColor" stroke-width="1.5"><ellipse cx="50" cy="30" rx="10" ry="4"/><ellipse cx="50" cy="30" rx="20" ry="8" opacity=".75" transform="rotate(30 50 30)"/><ellipse cx="50" cy="30" rx="30" ry="12" opacity=".5" transform="rotate(-30 50 30)"/></g><circle class="st" cx="50" cy="30" r="3.2" fill="#fff"/></svg></span><span><span class="tt"><b>The Philosophy of Becoming</b><small>Who we are while we change</small></span><span class="imp">ABHYNEX</span></span></span>
+          <span class="f back"></span><span class="f spine"><span>THE PHILOSOPHY OF BECOMING · ABHYNEX</span></span><span class="f pgs"></span><span class="f top"></span><span class="f bot"></span>
+        </span></span></span>
+        <span class="pdf-kind">English · Philosophy · 450 pages</span>
+        <span class="pdf-t">The Philosophy of Becoming</span><span class="pdf-s">Who we are while we change</span>
+        <span class="pdf-d">Identity, change and the person you are becoming.</span>
+        <span class="pdf-foot"><span class="sw" aria-hidden="true"><i></i><i></i><i></i></span><span class="pdf-open">Open PDF ↗</span></span>
+      </a>
+      <a class="pdfc" style="--pa:#b8b3ff;--pb:#8c6cff" href="https://abhishekchendake.wordpress.com/wp-content/uploads/2026/09/the_philosophy_of_the_unseen_500_plus_pages.pdf" target="_blank" rel="noopener" aria-label="Open PDF: What lies beyond what we can see">
+        <span class="pdf-no">06</span>
+        <span class="stage3" aria-hidden="true" style="--cv:#1d1a4a;--cv2:#8c6cff;--gold:#e4e0ff"><span class="sway"><span class="bk">
+          <span class="f front"><span class="rib">PDF</span><span class="seal">500+<small>pages</small></span><span><span class="au">ABHISHEK CHENDAKE</span><svg class="art" viewBox="0 0 100 60" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M8 30Q50 -2 92 30Q50 62 8 30Z"/><circle cx="50" cy="30" r="11"/><path d="M50 2v7M25 8l4 6M75 8l-4 6M50 58v-7" opacity=".55" stroke-dasharray="1 3"/></g><circle class="st" cx="50" cy="30" r="4.5" fill="#fff"/></svg></span><span><span class="tt"><b>The Philosophy of the Unseen</b><small>What lies beyond what we can see</small></span><span class="imp">ABHYNEX</span></span></span>
+          <span class="f back"></span><span class="f spine"><span>THE PHILOSOPHY OF THE UNSE · ABHYNEX</span></span><span class="f pgs"></span><span class="f top"></span><span class="f bot"></span>
+        </span></span></span>
+        <span class="pdf-kind">English · Philosophy · 500+ pages</span>
+        <span class="pdf-t">The Philosophy of the Unseen</span><span class="pdf-s">What lies beyond what we can see</span>
+        <span class="pdf-d">The hidden layers of mind, reality and existence.</span>
+        <span class="pdf-foot"><span class="sw" aria-hidden="true"><i></i><i></i><i></i></span><span class="pdf-open">Open PDF ↗</span></span>
+      </a>
+    </div>
+    <div class="strap" style="text-align:center">OPEN • READ • EXPLORE — ABHYNEX LIBRARY</div>
+  </section>
+
+  <section class="scene wrap th-author" id="author" data-shape="5" data-shift="1" data-zoom="5.6">
+    <div class="col lg">
+      <div class="sb" aria-hidden="true"><svg viewBox="0 0 200 200"><use href="#abxMini"/></svg><b>ABHYNEX</b><i>·</i><span>AUTHOR</span></div>
+      <div class="label">ABOUT THE AUTHOR · ABX CREATOR</div>
+      <h2>Abhishek Sanjay Chendake</h2>
+      <div class="roles">AUTHOR • AI CREATOR • ENGINEERING STUDENT • DIGITAL CREATOR</div>
+      <p>Abhishek Chendake is an independent author and writer from Mulegaon, Solapur, Maharashtra, India. He explores philosophy, self-discovery, human thought, existence and personal growth through his writing.</p>
+      <p>His interests connect writing, Artificial Intelligence, engineering, technology, creative thinking and continuous learning. Through books and digital projects, he explores ideas, knowledge and technology while building his own path in the digital world.</p>
+      <p>He is deeply curious about life, human nature, emotions and existence. He believes every individual has a unique story, and that writing is a way of thinking, a way to explore ideas and emotions.</p>
+      <p>His parents, Sanjay Chendake and Kavita Chendake, shaped his values and personality.</p>
+      <p>Through his books he aims to create moments of reflection: moments that make readers pause, question their beliefs and see things from a new perspective.</p>
+      <div class="facts">
+        <div class="fact"><span>BASED IN</span>Mulegaon, Solapur, Maharashtra</div>
+        <div class="fact"><span>EDUCATION</span>Mechanical Engineering</div>
+        <div class="fact"><span>WRITTEN BOOKS</span>3 Published Books</div>
+        <div class="fact"><span>INTERESTS</span>AI • Technology • Writing</div>
+        <div class="fact"><span>WRITES ABOUT</span>Philosophy • Self-discovery • Existence • Personal growth</div>
+      </div>
+      <blockquote class="quote">“Create ideas. Explore possibilities. Keep learning. Build something that lasts.”</blockquote>
+    </div>
+  </section>
+
+  <section class="scene wrap th-skills" id="skills" data-shape="5" data-shift="0" data-zoom="7">
+    <div class="col lg">
+      <div class="sb" aria-hidden="true"><svg viewBox="0 0 200 200"><use href="#abxMini"/></svg><b>ABHYNEX</b><i>·</i><span>SKILLS</span></div>
+      <div class="label">SKILLS • KNOWLEDGE • CREATION</div>
+      <h2>My Skills</h2>
+      <p class="lede">Technology, creativity, writing आणि continuous learning यांच्या संगमातून तयार होत असलेली माझी skill universe.</p>
+    </div>
+    <div class="cards">
+      <article class="glass"><div class="sym">✦</div><h3>Writing</h3><p>विचारांना स्पष्ट, प्रभावी आणि creative शब्दांमध्ये मांडण्याची आवड.</p></article>
+      <article class="glass"><div class="sym">◉</div><h3>Artificial Intelligence</h3><p>AI tools, assistants आणि intelligent digital applications तयार करण्याचा अभ्यास.</p></article>
+      <article class="glass"><div class="sym">◈</div><h3>Engineering</h3><p>Engineering concepts, problem solving आणि practical technology यामध्ये interest.</p></article>
+      <article class="glass"><div class="sym">⌘</div><h3>Technology</h3><p>Websites, digital products आणि modern technology ecosystem explore करण्याची आवड.</p></article>
+      <article class="glass"><div class="sym">∞</div><h3>Creative Thinking</h3><p>नवीन ideas शोधणे, concepts वेगळ्या पद्धतीने पाहणे आणि त्यांना digital form देणे.</p></article>
+      <article class="glass"><div class="sym">↗</div><h3>Continuous Learning</h3><p>नवीन knowledge, technologies आणि skills सतत शिकण्यावर focus.</p></article>
+    </div>
+    <div class="strap">LEARN • BUILD • EXPERIMENT • EVOLVE</div>
+  </section>
+
+  <section class="scene wrap th-education" id="education" data-shape="6" data-shift="1" data-zoom="5.6">
+    <div class="col lg">
+      <div class="sb" aria-hidden="true"><svg viewBox="0 0 200 200"><use href="#abxMini"/></svg><b>ABHYNEX</b><i>·</i><span>EDUCATION</span></div>
+      <div class="label">EDUCATION • LEARNING • GROWTH</div>
+      <h2>Education</h2>
+      <p class="lede">शालेय शिक्षणापासून engineering पर्यंतचा माझ्या learning journey चा digital timeline.</p>
+      <ol class="tl">
+        <li><div class="when">SCHOOL • FOUNDATION</div><h3>School Education</h3><div class="at">D.B.F. Dayanand College, Solapur</div><p>शालेय आणि higher-secondary शिक्षणातून पुढील academic journey साठी मजबूत foundation तयार केला.</p></li>
+        <li><div class="when">12TH • SCIENCE</div><h3>12th Standard</h3><div class="at">D.B.F. Dayanand College, Solapur</div><p>Science stream मधून 12वीचे शिक्षण पूर्ण केले आणि engineering education कडे पुढील पाऊल टाकले.</p></li>
+        <li><div class="when">CURRENT • ENGINEERING</div><h3>Mechanical Engineering</h3><div class="at">N. K. Orchid College of Engineering &amp; Technology, Solapur</div><p>Engineering, technology आणि practical problem-solving यांचा अभ्यास करत professional journey घडवत आहे.</p></li>
+        <li><div class="when">FUTURE • CONTINUOUS LEARNING</div><h3>Beyond Education</h3><div class="at">AI • Technology • Knowledge</div><p>College education सोबत Artificial Intelligence, programming, digital technology, writing आणि नवीन skills सतत शिकण्यावर focus.</p></li>
+      </ol>
+      <div class="strap">KNOWLEDGE IS A JOURNEY — NOT A DESTINATION</div>
+    </div>
+  </section>
+
+  <section class="scene wrap right th-journey" id="journey" data-shape="6" data-shift="-1" data-zoom="5.8">
+    <div class="col lg">
+      <div class="sb" aria-hidden="true"><svg viewBox="0 0 200 200"><use href="#abxMini"/></svg><b>ABHYNEX</b><i>·</i><span>JOURNEY</span></div>
+      <div class="label">MY JOURNEY • EVOLUTION</div>
+      <h2>My Journey</h2>
+      <p class="lede">Learning, writing, technology आणि creativity यांच्यासोबत सतत पुढे जाणारा माझा प्रवास.</p>
+      <ol class="tl">
+        <li><div class="when">BEGINNING</div><h3>Curiosity Begins</h3><p>नवीन गोष्टी जाणून घेण्याची आणि जगाकडे वेगळ्या नजरेने पाहण्याची सुरुवात.</p><div class="tags"><i>Curiosity</i><i>Learning</i></div></li>
+        <li><div class="when">WRITING</div><h3>Ideas Become Words</h3><p>विचार, अनुभव आणि जीवनाकडे पाहण्याचा दृष्टिकोन लिखाणातून व्यक्त करण्यास सुरुवात.</p><div class="tags"><i>Writing</i><i>Books</i><i>Ideas</i></div></li>
+        <li><div class="when">AUTHOR</div><h3>Becoming an Author</h3><p>स्वतःच्या विचारांना पुस्तकांच्या रूपात जगासमोर आणण्याचा लेखनप्रवास.</p><div class="tags"><i>3 Books</i><i>Author</i><i>Creative Work</i></div></li>
+        <li><div class="when">TECHNOLOGY</div><h3>Entering the Digital World</h3><p>Websites, AI आणि digital technology च्या माध्यमातून ideas ला interactive form देण्यास सुरुवात.</p><div class="tags"><i>AI</i><i>Technology</i><i>Digital</i></div></li>
+        <li><div class="when">NOW</div><h3>Building the Future</h3><p>Engineering, Artificial Intelligence, writing आणि creativity यांना एकत्र आणून नवीन projects आणि digital experiences तयार करण्याचा प्रवास.</p><div class="tags"><i>Engineering</i><i>AI</i><i>Creation</i></div></li>
+      </ol>
+      <div class="strap">THE JOURNEY CONTINUES… LEARN → CREATE → EXPLORE → EVOLVE</div>
+    </div>
+  </section>
+
+
+  <section class="scene wrap mid th-thoughts" id="thoughts" data-shape="7" data-shift="0" data-zoom="6.4">
+    <div class="bub" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="col lg">
+      <div class="sb" aria-hidden="true"><svg viewBox="0 0 200 200"><use href="#abxMini"/></svg><b>ABHYNEX</b><i>·</i><span>THOUGHTS</span></div>
+      <div class="label">MIND • TRUTH • GROWTH</div>
+      <h2>My Thoughts</h2>
+      <p class="lede">मराठी आणि English मधले माझे चिंतन — मन, सत्य आणि स्वतःचा शोध.</p>
+    </div>
+    <blockquote class="tq">“Thoughts are deeper than the words we use to express them.”<cite>— Abhishek Sanjay Chendake</cite></blockquote>
+    <div class="three tcards">
+      <a class="glass tc" style="--pa:#b79cff;--pb:#8c6cff" href="https://abhishekchendake.wordpress.com/my-thoughts/" target="_blank" rel="noopener"><span class="tc-i" aria-hidden="true">◐</span><div class="kind">01</div><h3>Thoughts &amp; Mind</h3><p>अंतर्मन आणि विचारप्रक्रियेचा शोध — विचार आपलं जगणं कसं घडवतात.</p></a>
+      <a class="glass tc" style="--pa:#ff8fb1;--pb:#ffb347" href="https://abhishekchendake.wordpress.com/my-thoughts/" target="_blank" rel="noopener"><span class="tc-i" aria-hidden="true">✧</span><div class="kind">02</div><h3>Truth &amp; the Unknown</h3><p>जिज्ञासा आणि समजून घेण्याचा प्रवास — अज्ञाताकडे बघण्याची नजर.</p></a>
+      <a class="glass tc" style="--pa:#7dffd1;--pb:#62d8ff" href="https://abhishekchendake.wordpress.com/my-thoughts/" target="_blank" rel="noopener"><span class="tc-i" aria-hidden="true">❖</span><div class="kind">03</div><h3>Self-Discovery &amp; Growth</h3><p>स्वतःमधला बदल आणि विकास — रोज थोडं अधिक चांगलं होण्याचा प्रयत्न.</p></a>
+    </div>
+    <div class="row"><a class="btn" href="https://abhishekchendake.wordpress.com/my-thoughts/" target="_blank" rel="noopener">Read My Thoughts ↗</a></div>
+  </section>
+
+  <section class="scene wrap th-about" id="about" data-shape="7" data-shift="0" data-zoom="7.5">
+    <div class="col lg">
+      <div class="sb" aria-hidden="true"><svg viewBox="0 0 200 200"><use href="#abxMini"/></svg><b>ABHYNEX</b><i>·</i><span>ABOUT</span></div>
+      <div class="label">DIGITAL PRESENCE • CONNECT</div>
+      <h2>Find Me Online</h2>
+      <p class="lede">माझ्या writing, technology, AI projects आणि digital work शी connect होण्यासाठी माझे प्रमुख platforms.</p>
+    </div>
+    <div class="cards plats">
+      <a class="glass plat" style="--pa:#5ab0ff;--pb:#a9d8ff" href="https://abhishekchendake.wordpress.com" target="_blank" rel="noopener"><span class="pi" aria-hidden="true">W</span><h3>Author Website</h3><span class="go-ar" aria-hidden="true">↗</span><p>माझ्या author profile, books आणि digital information साठी official website.</p></a>
+      <a class="glass plat" style="--pa:#2f8bff;--pb:#7cc4ff" href="https://www.linkedin.com/in/abhishek-chendake-4b24a1438" target="_blank" rel="noopener"><span class="pi" aria-hidden="true">in</span><h3>LinkedIn</h3><span class="go-ar" aria-hidden="true">↗</span><p>Professional profile, engineering, technology आणि career journey.</p></a>
+      <a class="glass plat" style="--pa:#b8b3ff;--pb:#7a6bff" href="https://abhishekchendake23-create.github.io/Abhishek-chendake-/" target="_blank" rel="noopener"><span class="pi" aria-hidden="true">G</span><h3>GitHub</h3><span class="go-ar" aria-hidden="true">↗</span><p>Websites, coding experiments आणि technology projects साठी digital space.</p></a>
+      <a class="glass plat" style="--pa:#a58bff;--pb:#ff4fa3" href="https://astra-nexus-cosmos.lovable.app" target="_blank" rel="noopener"><span class="pi" aria-hidden="true">N</span><h3>Astra Nexus AI</h3><span class="go-ar" aria-hidden="true">↗</span><p>Artificial Intelligence आणि next-generation digital assistant project.</p></a>
+      <a class="glass plat" style="--pa:#f6d89a;--pb:#e9a94b" href="https://abhi29.lovable.app/c/lja1wxb5mujermt9" target="_blank" rel="noopener"><span class="pi" aria-hidden="true">A</span><h3>Abhi AI</h3><span class="go-ar" aria-hidden="true">↗</span><p>माझ्या AI projects पैकी एक personal intelligent assistant experience.</p></a>
+      <a class="glass plat" style="--pa:#ffa733;--pb:#ffd27a" href="https://www.amazon.com/author/abhi.amazon.com.author." target="_blank" rel="noopener"><span class="pi" aria-hidden="true">a</span><h3>Amazon Author</h3><span class="go-ar" aria-hidden="true">↗</span><p>माझ्या published books आणि author presence साठी Amazon profile.</p></a>
+      <a class="glass plat" style="--pa:#62d8ff;--pb:#7dffd1" href="https://abhynexen.lovable.app/search?q=hello&amp;tab=all" target="_blank" rel="noopener"><span class="pi" aria-hidden="true">S</span><h3>ABHYNEX Search</h3><span class="go-ar" aria-hidden="true">↗</span><p>Live web results with cited AI answers.</p></a>
+      <a class="glass plat" style="--pa:#7ddc6a;--pb:#d8f06a" href="https://share.google/lq4TKW043VFlQrhnV" target="_blank" rel="noopener"><span class="pi" aria-hidden="true">F</span><h3>Chendake Farmers BDL</h3><span class="go-ar" aria-hidden="true">↗</span><p>आधुनिक शेती मार्गदर्शन.</p></a>
+    </div>
+    <div class="strap">CREATE • CONNECT • EXPLORE — WELCOME TO THE DIGITAL SIDE OF ABHYNEX.</div>
+
+    <h3 class="sub-h">About ABHYNEX</h3>
+    <p class="lede">A digital universe built from curiosity, creativity, technology and the continuous pursuit of knowledge.</p>
+    <div class="three pcs">
+      <article class="glass pc" style="--pa:#62d8ff;--pb:#8c6cff"><span class="pc-i" aria-hidden="true">◎</span><div class="kind">VISION</div><h3>My Vision</h3><p>To explore ideas, build meaningful technology and create a digital identity that connects knowledge, creativity, artificial intelligence and human thinking.</p></article>
+      <article class="glass pc" style="--pa:#ffb347;--pb:#ff4fa3"><span class="pc-i" aria-hidden="true">✺</span><div class="kind">BELIEF</div><h3>What I Believe</h3><p>Learning has no final destination. Every question, experiment and failure can become a step toward a better version of yourself.</p></article>
+      <article class="glass pc" style="--pa:#7dffd1;--pb:#62d8ff"><span class="pc-i" aria-hidden="true">⌘</span><div class="kind">BUILD</div><h3>What I Build</h3><p>Books, AI applications, digital experiences and ideas that combine technology with creativity.</p></article>
+    </div>
+    <div class="stats">
+      <div class="stat st0" style="--pa:#62d8ff;--pb:#8c6cff"><b>03</b><span>Published Books</span></div>
+      <div class="stat st1" style="--pa:#ffb347;--pb:#ff4fa3"><b>05</b><span>Digital Projects</span></div>
+      <div class="stat st2" style="--pa:#7dffd1;--pb:#62d8ff"><b>06</b><span>Core Skills</span></div>
+      <div class="stat st3" style="--pa:#a58bff;--pb:#ff4fa3"><b>∞</b><span>Ideas to Explore</span></div>
+    </div>
+    <blockquote class="quote">“Think beyond limits. Create beyond expectations. Keep learning. Keep evolving.” — ABHYNEX</blockquote>
+  </section>
+
+  <section class="scene wrap mid th-contact" id="contact" data-shape="7" data-shift="0" data-zoom="8.5">
+    <div class="col lg">
+      <div class="sb" aria-hidden="true"><svg viewBox="0 0 200 200"><use href="#abxMini"/></svg><b>ABHYNEX</b><i>·</i><span>CONTACT</span></div>
+      <div class="label">✦ LET'S CONNECT</div>
+      <h2>Start a Conversation</h2>
+      <p class="lede">Have an idea, project, collaboration or simply want to connect? Step into the ABHYNEX universe.</p>
+      <div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,11rem),1fr))">
+        <article class="glass"><div class="kind">01 · IDEAS</div><p>Share your ideas and thoughts.</p></article>
+        <article class="glass"><div class="kind">02 · PROJECTS</div><p>Explore creative collaborations.</p></article>
+        <article class="glass"><div class="kind">03 · TECHNOLOGY</div><p>Connect around AI and technology.</p></article>
+      </div>
+    </div>
+    <div class="cdet">
+      <article class="glass">
+        <div class="kind">EMAIL</div>
+        <div class="v" id="mailTxt">abhishekchendake23@gmail.com</div>
+        <button class="mini" id="copyMail" type="button">Copy email</button>
+      </article>
+      <article class="glass">
+        <div class="kind">LOCATION</div>
+        <div class="v">Mulegaon, Solapur, Maharashtra, India</div>
+      </article>
+      <article class="glass">
+        <div class="kind">HOURS</div>
+        <div class="v">Monday–Saturday, 10:00 AM–6:00 PM IST</div>
+        <div class="avail" id="avail"><i></i><span>Checking…</span></div>
+      </article>
+    </div>
+    <div class="row" style="margin-top:1.6rem">
+      <a class="btn go" href="https://abhishekchendake.wordpress.com/about/" target="_blank" rel="noopener">Author website</a>
+      <a class="btn" href="https://www.linkedin.com/in/abhishek-chendake-4b24a1438" target="_blank" rel="noopener">LinkedIn</a>
+      <a class="btn" href="mailto:abhishekchendake23@gmail.com">Write an email</a>
+    </div>
+  </section>
+
+  <div class="wrap cta">
+    <h2>Keep Exploring. Keep Creating. Keep Evolving.</h2>
+    <p class="lede">The journey does not end here. Every idea can become a creation, and every creation can open a new universe.</p>
+    <div class="row" style="justify-content:center">
+      <a class="btn go" href="#home">Return to universe</a>
+      <a class="btn" href="#about">Explore my world</a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="fgrid">
+    <div>
+      <div class="fbrand"><span class="mark"><svg class="logo" viewBox="0 0 200 200" role="img" aria-label="ABHYNEX logo">
+<defs>
+<linearGradient id="lgft" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#62d8ff"/><stop offset=".5" stop-color="#8c6cff"/><stop offset="1" stop-color="#ff4fa3"/></linearGradient>
+<linearGradient id="lhft" x1="1" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffb347"/><stop offset="1" stop-color="#ff4fa3"/></linearGradient>
+<radialGradient id="lcft"><stop offset="0" stop-color="#fff"/><stop offset=".4" stop-color="#9fe6ff"/><stop offset="1" stop-color="#62d8ff" stop-opacity="0"/></radialGradient>
+</defs>
+<g class="lr lr1"><circle cx="100" cy="100" r="94" fill="none" stroke="url(#lgft)" stroke-width="2.4" stroke-dasharray="120 28 40 28"/></g>
+<g class="lr lr2"><circle cx="100" cy="100" r="80" fill="none" stroke="url(#lhft)" stroke-width="1.4" stroke-dasharray="2 8"/><circle cx="100" cy="20" r="3.5" fill="#fff"/><circle cx="100" cy="180" r="2.5" fill="#ffb347"/></g>
+<g transform="rotate(-24 100 100)"><g class="lr lr3"><ellipse cx="100" cy="100" rx="70" ry="24" fill="none" stroke="url(#lgft)" stroke-width="1.6" stroke-opacity=".8"/><circle cx="170" cy="100" r="4.5" fill="#fff"/></g></g>
+<path d="M62 142 L100 56 L138 142" fill="none" stroke="url(#lgft)" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M80 116 H120" stroke="url(#lhft)" stroke-width="7" stroke-linecap="round"/>
+<circle cx="100" cy="56" r="14" fill="url(#lcft)"/><circle cx="100" cy="56" r="4.5" fill="#fff"/>
+</svg></span>ABHYNEX</div>
+      <p>A digital universe created around ideas, artificial intelligence, technology, engineering, writing and continuous learning.</p>
+      <p>Created by <b>Abhishek Chendake</b>. Writer, AI creator, engineering student and digital creator.</p>
+    </div>
+    <div><h4>EXPLORE</h4><a href="#home">Home</a><a href="#ai">AI Universe</a><a href="#live">Live</a><a href="#farm">Farm</a><a href="#books">Books</a><a href="#library">PDFs</a><a href="#author">Author</a><a href="#skills">Skills</a></div>
+    <div><h4>JOURNEY</h4><a href="#education">Education</a><a href="#journey">My Journey</a><a href="#about">About</a><a href="#contact">Contact</a></div>
+    <div><h4>DIGITAL</h4>
+      <a href="https://abhi29.lovable.app/c/lja1wxb5mujermt9" target="_blank" rel="noopener">Abhi AI ↗</a>
+      <a href="https://astra-nexus-cosmos.lovable.app" target="_blank" rel="noopener">Astra Nexus AI ↗</a>
+      <a href="https://abhynexen.lovable.app/search?q=hello&amp;tab=all" target="_blank" rel="noopener">ABHYNEX Search ↗</a>
+      <a href="https://share.google/lq4TKW043VFlQrhnV" target="_blank" rel="noopener">Chendake Farmers BDL ↗</a>
+      <a href="https://abhishekchendake23-create.github.io/Abhishek-chendake-/" target="_blank" rel="noopener">GitHub ↗</a>
+      <a href="https://www.linkedin.com/in/abhishek-chendake-4b24a1438" target="_blank" rel="noopener">LinkedIn ↗</a>
+    </div>
+    <div><h4>BOOKS</h4>
+      <a href="https://a.co/d/02rTWJzM" target="_blank" rel="noopener">विचारांचं महासागर ↗</a>
+      <a href="https://read.amazon.co.uk/kp/embed/?asin=B0HK5187XN" target="_blank" rel="noopener">अज्ञांताचा शोध ↗</a>
+      <a href="https://read.amazon.com/kp/embed/?asin=B0HK8QHT4X" target="_blank" rel="noopener">The Better Version of You ↗</a>
+      <a href="https://www.amazon.com/author/abhi.amazon.com.author." target="_blank" rel="noopener">Amazon Author ↗</a>
+    </div>
+  </div>
+  <div class="fend">
+    <span>CREATE. EXPLORE. EVOLVE. The universe keeps expanding. So should your ideas.</span>
+    <span>© Abhishek Chendake. All rights reserved.</span>
+  </div>
+</footer>
+
+<div class="ticker" role="status" aria-label="Live ticker">
+  <div class="tk-live"><i></i><span>LIVE</span><time id="tkTime">--:--:--</time><small>IST</small></div>
+  <div class="tk-track"><div class="tk-move" id="tkMove"></div></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  var root=document.documentElement;
+  var reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var wide=function(){return innerWidth>820;};
+  var $=function(id){return document.getElementById(id);};
+  function txt(id,s){var e=$(id);if(e)e.textContent=s;}
+  function pad(n){return ("0"+n).slice(-2);}
+
+  window.__abxReady=1;
+  window.__abxSnd=0;
+  /* ---------- sound: a small synth, every section plays the ABHYNEX motif in its own key and timbre ---------- */
+  var AC=null,master=null,verb=null,bus=null,ob=null,nbuf=null,snd=true;
+  try{if(localStorage.getItem("abxSnd")==="0")snd=false;}catch(e){}
+  function audio(){
+    if(AC)return AC;
+    var C=window.AudioContext||window.webkitAudioContext;if(!C)return null;
+    try{
+      AC=new C();
+      var comp=AC.createDynamicsCompressor();master=AC.createGain();master.gain.value=.75;master.connect(comp);comp.connect(AC.destination);
+      ob=AC.createGain();ob.connect(master);bus=master;
+      var len=Math.floor(AC.sampleRate*1.8),buf=AC.createBuffer(2,len,AC.sampleRate);
+      for(var c=0;c<2;c++){var d=buf.getChannelData(c);for(var k=0;k<len;k++)d[k]=(Math.random()*2-1)*Math.pow(1-k/len,2.6);}
+      verb=AC.createConvolver();verb.buffer=buf;var vg=AC.createGain();vg.gain.value=.32;verb.connect(vg);vg.connect(master);
+      var nl=AC.sampleRate,nb=AC.createBuffer(1,nl,AC.sampleRate),nd=nb.getChannelData(0);for(var q=0;q<nl;q++)nd[q]=Math.random()*2-1;nbuf=nb;
+    }catch(e){AC=null;}
+    return AC;
+  }
+  function ready(fn){
+    var a=audio();if(!a||!snd)return;
+    if(a.state==="running")fn();else{try{a.resume().then(function(){if(snd)fn();}).catch(function(){});}catch(e){}}
+  }
+  function osc(type,f,t,dur,vol,o){
+    var a=AC;o=o||{};var t0=a.currentTime+t;
+    var s=a.createOscillator(),g=a.createGain();
+    s.type=type;s.frequency.setValueAtTime(f,t0);
+    if(o.to)s.frequency.exponentialRampToValueAtTime(o.to,t0+dur);
+    g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(vol,t0+(o.atk||.008));g.gain.exponentialRampToValueAtTime(.0001,t0+dur);
+    if(o.lp){var fl=a.createBiquadFilter();fl.type="lowpass";fl.frequency.value=o.lp;s.connect(fl);fl.connect(g);}else s.connect(g);
+    g.connect(bus);if(o.rev!==false)g.connect(verb);
+    s.start(t0);s.stop(t0+dur+.05);window.__abxSnd++;
+  }
+  function noise(t,dur,vol,f0,f1,q){
+    var a=AC,t0=a.currentTime+t,s=a.createBufferSource(),fl=a.createBiquadFilter(),g=a.createGain();
+    s.buffer=nbuf;s.loop=true;fl.type="bandpass";fl.Q.value=q||1.2;fl.frequency.setValueAtTime(f0,t0);fl.frequency.exponentialRampToValueAtTime(f1,t0+dur);
+    g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(vol,t0+dur*.5);g.gain.exponentialRampToValueAtTime(.0001,t0+dur);
+    s.connect(fl);fl.connect(g);g.connect(bus);g.connect(verb);s.start(t0);s.stop(t0+dur+.05);window.__abxSnd++;
+  }
+  var TIM={
+    bell:function(f,t,v){osc("sine",f,t,1.6,v);osc("sine",f*2.76,t,.9,v*.28);osc("sine",f*5.4,t,.4,v*.12);},
+    glass:function(f,t,v){osc("triangle",f,t,.9,v*.8);osc("sine",f*3,t,.5,v*.3);},
+    pluck:function(f,t,v){osc("sawtooth",f,t,.55,v*.55,{lp:2200});osc("sine",f*2,t,.3,v*.25);},
+    marimba:function(f,t,v){osc("sine",f,t,.5,v);osc("sine",f*4,t,.18,v*.35);},
+    pad:function(f,t,v){osc("sawtooth",f,t,1.5,v*.35,{lp:1100,atk:.18});osc("sine",f*.5,t,1.5,v*.5,{atk:.2});}
+  };
+  var NOTE=[0,4,7,12];
+  function motif(root,tim,vol){
+    var play=TIM[tim]||TIM.bell;
+    for(var i=0;i<NOTE.length;i++)play(root*Math.pow(2,NOTE[i]/12),i*.075,(vol||.16)*(i===3?1.15:1));
+  }
+  var SND={home:[261.6,"bell"],ai:[293.7,"glass"],live:[329.6,"pluck"],farm:[196,"marimba"],books:[220,"pad"],jarvis:[329.6,"glass"],library:[392,"marimba"],thoughts:[207.7,"pad"],author:[246.9,"bell"],skills:[349.2,"pluck"],education:[277.2,"glass"],journey:[233.1,"pad"],about:[311.1,"bell"],contact:[261.6,"glass"]};
+  function sectionSound(id){var s=SND[id]||SND.home;ready(function(){bus=master;motif(s[0],s[1]);});}
+  var lastSnd=0;
+  function touchFx(e,sec){
+    var now=performance.now();if(now-lastSnd<260)return;lastSnd=now;
+    var col="#62d8ff";try{col=getComputedStyle(sec).getPropertyValue("--a").trim()||col;}catch(x){}
+    for(var k=0;k<2;k++){var r=document.createElement("span");r.className="rip"+(k?" r2":"");r.style.left=e.clientX+"px";r.style.top=e.clientY+"px";r.style.setProperty("--rc",col);document.body.appendChild(r);(function(r){setTimeout(function(){if(r.parentNode)r.parentNode.removeChild(r);},1300);})(r);}
+    sectionSound(sec.id||"home");
+  }
+  document.addEventListener("click",function(e){
+    if(!e.target||!e.target.closest||document.documentElement.classList.contains("intro")&&!document.documentElement.classList.contains("go"))return;
+    var sec=e.target.closest("section.scene");
+    if(!sec){var f=e.target.closest("footer,.cta");if(f){sec=$("contact")||f;}}
+    if(sec)touchFx(e,sec);
+  });
+  var pillEl=$("pill");
+  if(pillEl)pillEl.addEventListener("click",function(e){var a=e.target.closest&&e.target.closest("a");if(a){var id=(a.getAttribute("href")||"").slice(1);sectionSound(id);}});
+  var brandEl=document.querySelector(".brand");if(brandEl)brandEl.addEventListener("click",function(){sectionSound("home");});
+  var sndBtn=$("sndBtn");
+  function syncBtn(){if(sndBtn)sndBtn.setAttribute("aria-pressed",snd?"true":"false");}
+  function setSnd(on,save){snd=on;syncBtn();if(save){try{localStorage.setItem("abxSnd",on?"1":"0");}catch(e){}}if(!on&&master){try{master.gain.setTargetAtTime(0,AC.currentTime,.04);}catch(e){}}else if(on&&master){try{master.gain.setTargetAtTime(.75,AC.currentTime,.02);}catch(e){}}}
+  syncBtn();
+  if(sndBtn)sndBtn.addEventListener("click",function(){setSnd(!snd,true);if(snd)sectionSound("home");});
+
+  /* ---------- opening: tap to enter, boom with warp lines, name arrives note by note, brands, iris ---------- */
+  var introOv=$("introOv"),hasIntro=root.classList.contains("intro");
+  var introStart=hasIntro?Infinity:performance.now(),boomRun=false,started=false,TOTAL=5600,boomT0=0;
+  var gate=$("gate"),skipBtn=$("introSkip");
+  var opened=false;
+  function openingSound(){
+    if(opened)return;opened=true;
+    bus=ob;ob.gain.cancelScheduledValues(0);ob.gain.value=1;
+    /* riser into the boom */
+    noise(0,.5,.22,300,5000,.8);osc("sine",70,0,.5,.3,{to:480,rev:false});
+    /* boom */
+    osc("sine",110,.5,1.5,.9,{to:34,rev:false});noise(.5,1.1,.35,2400,120,.7);
+    [261.6,392,523.3,659.3].forEach(function(f,k){TIM.bell(f,.52+k*.03,.12);});
+    /* ABHYNEX letters, ascending pentatonic */
+    var pent=[523.3,587.3,659.3,784,880,1046.5,1318.5];
+    for(var i=0;i<7;i++)TIM.bell(pent[i],1.9+i*.11,.13);
+    /* the four brands, each in its own timbre */
+    TIM.bell(392,3.3,.14);TIM.glass(440,3.3,.1);TIM.glass(523.3,3.8,.14);TIM.glass(659.3,3.8,.08);
+    TIM.pluck(587.3,4.3,.16);TIM.pluck(880,4.38,.12);TIM.marimba(659.3,4.8,.18);TIM.marimba(988,4.88,.14);
+    /* final chord and the iris whoosh */
+    [130.8,196,261.6,329.6,392].forEach(function(f,k){TIM.pad(f,5.05,.2-k*.012);});
+    motif(523.3,"bell",.15);
+    noise(5.55,1,.3,6000,200,.6);
+    bus=master;
+  }
+  function startBoom(){
+    var cv=$("boom");if(!cv)return;
+    var ctx=cv.getContext("2d");if(!ctx)return;
+    var dpr=Math.min(devicePixelRatio||1,2),W=cv.width=Math.round(innerWidth*dpr),H=cv.height=Math.round(innerHeight*dpr);
+    var pal=["#62d8ff","#8c6cff","#ff4fa3","#ffb347","#ffffff","#7dffd1"],ps=[],start=performance.now()+500,spawned=false,last=0,m=Math.max(W,H);
+    boomRun=true;
+    function spawn(){
+      var n=wide()?560:320;
+      for(var i=0;i<n;i++){
+        var a=Math.random()*6.2832,sp=Math.pow(Math.random(),.6)*m*(.35+Math.random()*.9),warp=i%3===0;
+        ps.push({x:W/2,y:H/2,vx:Math.cos(a)*sp*(warp?1.6:1),vy:Math.sin(a)*sp*(warp?1.6:1),life:1.2+Math.random()*1.6,age:0,r:(.8+Math.random()*2.2)*dpr,c:pal[(Math.random()*pal.length)|0],w:warp});
+      }
+    }
+    function f(now){
+      if(!boomRun)return;
+      requestAnimationFrame(f);
+      if(!spawned){
+        /* before the boom: streaks fall inward toward the centre */
+        if(now<start){var tt=1-(start-now)/500;ctx.globalCompositeOperation="destination-out";ctx.fillStyle="rgba(0,0,0,.3)";ctx.fillRect(0,0,W,H);ctx.globalCompositeOperation="lighter";
+          ctx.lineWidth=1.2*dpr;ctx.strokeStyle="rgba(150,220,255,.7)";ctx.beginPath();
+          for(var q=0;q<40;q++){var a=q*0.157+tt,r0=m*(.75-.7*tt)*(.6+(q%5)*.1),r1=r0+m*.1;ctx.moveTo(W/2+Math.cos(a)*r1,H/2+Math.sin(a)*r1);ctx.lineTo(W/2+Math.cos(a)*r0,H/2+Math.sin(a)*r0);}
+          ctx.stroke();return;}
+        spawn();spawned=true;last=now;
+      }
+      var dt=Math.min(.05,(now-last)/1000);last=now;
+      ctx.globalCompositeOperation="destination-out";ctx.fillStyle="rgba(0,0,0,.18)";ctx.fillRect(0,0,W,H);
+      ctx.globalCompositeOperation="lighter";
+      var drag=Math.pow(.2,dt),alive=[];
+      for(var i=0;i<ps.length;i++){
+        var p=ps[i];p.age+=dt;if(p.age>=p.life)continue;
+        p.vx*=drag;p.vy*=drag;var ox=p.x,oy=p.y;p.x+=p.vx*dt;p.y+=p.vy*dt;
+        ctx.globalAlpha=1-p.age/p.life;
+        if(p.w){ctx.strokeStyle=p.c;ctx.lineWidth=p.r*.8;ctx.beginPath();ctx.moveTo(p.x-p.vx*.045,p.y-p.vy*.045);ctx.lineTo(p.x,p.y);ctx.stroke();}
+        else{ctx.fillStyle=p.c;ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.2832);ctx.fill();}
+        alive.push(p);
+      }
+      ctx.globalAlpha=1;ps=alive;
+      if(spawned&&!ps.length)boomRun=false;
+    }
+    requestAnimationFrame(f);
+  }
+  function startIntro(withSound,silentAuto){
+    if(started)return;started=true;
+    if(withSound){syncBtn();var a=audio();if(a){var t00=performance.now();try{a.resume().then(function(){if(snd&&performance.now()-t00<900)openingSound();}).catch(function(){});if(a.state==="running"&&snd)openingSound();}catch(e){}}}
+    else if(!silentAuto){setSnd(false,true);}
+    else{snd=false;syncBtn();}
+    if(gate)gate.classList.add("out");
+    root.classList.add("go");if(introOv)introOv.classList.add("play");
+    introStart=performance.now()+TOTAL;
+    startBoom();
+  }
+  if(hasIntro){requestAnimationFrame(function(){startIntro(snd);});}
+  if(skipBtn)skipBtn.addEventListener("click",function(){
+    introOv.classList.add("skip");root.style.setProperty("--d0","0s");introStart=performance.now();boomRun=false;
+    if(ob&&AC){try{ob.gain.setTargetAtTime(0,AC.currentTime,.05);}catch(e){}}
+  });
+
+  /* books: dust motes, and the book turns toward the pointer */
+  (function(){
+    var d=$("dust");if(d){var h="";for(var i=0;i<26;i++){h+='<i style="--x:'+(Math.random()*100).toFixed(1)+'%;--s:'+(2+Math.random()*3).toFixed(1)+'px;--t:'+(9+Math.random()*10).toFixed(1)+'s;--dl:-'+(Math.random()*14).toFixed(1)+'s;--dx:'+((Math.random()-.5)*120).toFixed(0)+'px"></i>';}d.innerHTML=h;}
+    document.querySelectorAll(".bookcard,.pdfc").forEach(function(c){
+      var b=c.querySelector(".bk");if(!b)return;
+      c.addEventListener("pointermove",function(e){var r=c.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5;b.style.setProperty("--bry",(-20+x*60).toFixed(1)+"deg");},{passive:true});
+      c.addEventListener("pointerleave",function(){b.style.removeProperty("--bry");});
+    });
+  })();
+
+
+  var toTop=$("toTop");
+  if(toTop){
+    addEventListener("scroll",function(){toTop.classList.toggle("show",scrollY>900);},{passive:true});
+    toTop.addEventListener("click",function(){scrollTo({top:0,behavior:reduce?"auto":"smooth"});sectionSound("home");});
+  }
+  /* ---------- clocks ---------- */
+  var TZ="Asia/Kolkata";
+  var pf=new Intl.DateTimeFormat("en-GB",{timeZone:TZ,hour:"2-digit",minute:"2-digit",second:"2-digit",weekday:"short",hour12:false});
+  var dfEn,dfMr;
+  try{dfEn=new Intl.DateTimeFormat("en-IN",{timeZone:TZ,weekday:"long",day:"numeric",month:"long",year:"numeric"});}catch(e){}
+  try{dfMr=new Intl.DateTimeFormat("mr-IN",{timeZone:TZ,weekday:"long",day:"numeric",month:"long",year:"numeric"});}catch(e){}
+  function ist(d){var o={};pf.formatToParts(d).forEach(function(p){o[p.type]=p.value;});o.h=(+o.hour)%24;o.m=+o.minute;o.s=+o.second;return o;}
+  var cities=[["Solapur","Asia/Kolkata"],["London","Europe/London"],["New York","America/New_York"],["Tokyo","Asia/Tokyo"],["Sydney","Australia/Sydney"]];
+  var fmts=cities.map(function(c){return new Intl.DateTimeFormat("en-GB",{timeZone:c[1],hour:"2-digit",minute:"2-digit",hour12:false});});
+  var clockBox=$("clocks");
+  if(clockBox)clockBox.innerHTML=cities.map(function(c){return '<div class="clock"><span>'+c[0]+'</span><time></time></div>';}).join("");
+  var tEls=clockBox?clockBox.querySelectorAll("time"):[];
+  function tickClock(){
+    var d=new Date(),t=ist(d),str=pad(t.h)+":"+pad(t.m)+":"+pad(t.s);
+    txt("tkTime",str);txt("bigClock",str);
+    var sec=t.h*3600+t.m*60+t.s,pct=sec/864,rem=86400-sec;
+    var bar=$("dayBar");if(bar)bar.style.width=pct.toFixed(1)+"%";
+    txt("dayTxt","Day progress "+Math.floor(pct)+"% · "+Math.floor(rem/3600)+"h "+Math.floor(rem%3600/60)+"m left");
+    var g=t.h>=5&&t.h<12?"शुभ प्रभात · Good morning":t.h>=12&&t.h<16?"शुभ दुपार · Good afternoon":t.h>=16&&t.h<20?"शुभ संध्याकाळ · Good evening":"शुभ रात्री · Good night";
+    txt("greet",g);
+    if(dfMr)txt("dateMr",dfMr.format(d));
+    if(dfEn)txt("dateEn",dfEn.format(d));
+    for(var i=0;i<fmts.length&&i<tEls.length;i++)tEls[i].textContent=fmts[i].format(d);
+    var av=$("avail");
+    if(av){var on=t.weekday!=="Sun"&&t.h>=10&&t.h<18;av.classList.toggle("off",!on);av.lastChild.textContent=on?"Available now":"Offline now. Back Monday to Saturday from 10:00 AM IST.";}
+  }
+  tickClock();setInterval(tickClock,1000);
+
+  /* 24-hour dial: ticks, and a hand set to the viewer's local time */
+  var tk=$("ticks24"),hand=$("hand24");
+  if(tk&&hand){
+    var ts="";
+    for(var ti=0;ti<24;ti++){
+      var big=ti%6===0,ang=ti*15*Math.PI/180,r1=big?72:78,sn=Math.sin(ang),cs=Math.cos(ang);
+      ts+='<line x1="'+(100+sn*r1).toFixed(1)+'" y1="'+(100-cs*r1).toFixed(1)+'" x2="'+(100+sn*86).toFixed(1)+'" y2="'+(100-cs*86).toFixed(1)+'" stroke="'+(big?"#fff":"rgba(255,160,150,.55)")+'" stroke-width="'+(big?2:1.2)+'" stroke-linecap="round"/>';
+      if(big)ts+='<text class="tk" x="'+(100+sn*60).toFixed(1)+'" y="'+(100-cs*60+3.5).toFixed(1)+'" text-anchor="middle">'+ti+'</text>';
+    }
+    tk.innerHTML=ts;
+    var setHand=function(){var d=new Date();hand.style.transform="rotate("+(((d.getHours()+d.getMinutes()/60)/24)*360).toFixed(2)+"deg)";};
+    setHand();setInterval(setHand,30000);
+  }
+
+  /* ---------- live data: weather, quakes, tech stories, ticker ---------- */
+  var live={};
+  var baseItems=[["ABHYNEX Search","Live web results with cited AI answers"],["ABHYNEX 24 Hours","The world, live. Every hour."],["Abhi AI","Smart chat. Everyday intelligence."],["Astra Nexus AI","An experimental AI universe"],["Chendake Farmers BDL","आधुनिक शेती मार्गदर्शन"]];
+  function renderTicker(){
+    var mv=$("tkMove"),tr=mv&&mv.parentNode;if(!mv)return;
+    var items=[];["wx","eq","hn"].forEach(function(k){if(live[k])items.push(live[k]);});
+    items=items.concat(baseItems);
+    mv.textContent="";
+    function pass(){items.forEach(function(it){var s=document.createElement("span");s.className="tki";var b=document.createElement("b");b.textContent=it[0];s.appendChild(b);s.appendChild(document.createTextNode(it[1]+"  ✦"));mv.appendChild(s);});}
+    pass();
+    var w1=mv.scrollWidth||1,reps=Math.max(1,Math.min(8,Math.ceil((tr.clientWidth||800)/w1)));
+    for(var i=1;i<reps*2;i++)pass();
+    mv.style.animationDuration=Math.max(30,Math.round(mv.scrollWidth/2/55))+"s";
+  }
+  renderTicker();
+  function getJSON(u,ms){
+    var c=new AbortController(),t=setTimeout(function(){c.abort();},ms||9000);
+    return fetch(u,{signal:c.signal}).then(function(r){clearTimeout(t);if(!r.ok)throw new Error(r.status);return r.json();},function(e){clearTimeout(t);throw e;});
+  }
+  function stamp(id){var t=ist(new Date());txt(id,"Updated "+pad(t.h)+":"+pad(t.m)+" IST");}
+  function ago(ms){var m=Math.max(0,Math.round((Date.now()-ms)/60000));return m<60?m+" min ago":Math.round(m/60)+" h ago";}
+  function wmo(c){
+    if(c===0)return"Clear sky";if(c===1)return"Mainly clear";if(c===2)return"Partly cloudy";if(c===3)return"Overcast";
+    if(c===45||c===48)return"Fog";if(c>=51&&c<=57)return"Drizzle";if(c>=61&&c<=67)return"Rain";if(c>=71&&c<=77)return"Snow";
+    if(c>=80&&c<=82)return"Rain showers";if(c===85||c===86)return"Snow showers";if(c>=95)return"Thunderstorm";return"Weather update";
+  }
+  function loadWeather(){
+    getJSON("https://api.open-meteo.com/v1/forecast?latitude=17.66&longitude=75.91&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&timezone=Asia%2FKolkata").then(function(j){
+      var c=j.current,d=wmo(c.weather_code),tp=Math.round(c.temperature_2m);
+      txt("wxTemp",tp+"°C");txt("wxDesc",d);
+      txt("wxMeta","Feels like "+Math.round(c.apparent_temperature)+"°C · Humidity "+c.relative_humidity_2m+"% · Wind "+Math.round(c.wind_speed_10m)+" km/h");
+      stamp("wxUp");live.wx=["Solapur",tp+"°C, "+d];renderTicker();
+    }).catch(function(){txt("wxDesc","Live weather is not reachable right now.");});
+  }
+  function loadQuakes(){
+    getJSON("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson",10000).then(function(j){
+      var f=(j.features||[]).filter(function(x){return x.properties&&x.properties.mag!=null;}).sort(function(a,b){return b.properties.time-a.properties.time;});
+      var top=f.slice().sort(function(a,b){return b.properties.mag-a.properties.mag;})[0];
+      txt("eqHead",f.length+" quakes of M2.5+ in 24 hours"+(top?". Strongest: M"+top.properties.mag.toFixed(1)+".":"."));
+      var ul=$("eqList");ul.textContent="";
+      f.slice(0,4).forEach(function(x){
+        var p=x.properties,li=document.createElement("li"),b=document.createElement("span");
+        b.className="mg"+(p.mag>=5?" m5":p.mag>=4?" m4":"");b.textContent="M"+p.mag.toFixed(1);
+        li.appendChild(b);li.appendChild(document.createTextNode((p.place||"Unknown place")+" · "+ago(p.time)));ul.appendChild(li);
+      });
+      stamp("eqUp");
+      if(f[0])live.eq=["Quake","M"+f[0].properties.mag.toFixed(1)+" "+(f[0].properties.place||"")+" · "+ago(f[0].properties.time)];
+      renderTicker();
+    }).catch(function(){txt("eqHead","Live quake data is not reachable right now.");});
+  }
+  function loadHN(){
+    getJSON("https://hacker-news.firebaseio.com/v0/topstories.json").then(function(ids){
+      return Promise.all(ids.slice(0,5).map(function(id){return getJSON("https://hacker-news.firebaseio.com/v0/item/"+id+".json");}));
+    }).then(function(items){
+      items=items.filter(function(x){return x&&x.title;});
+      txt("hnHead","Top stories on Hacker News");
+      var ul=$("hnList");ul.textContent="";
+      items.forEach(function(it){
+        var li=document.createElement("li"),a=document.createElement("a");
+        a.href=it.url&&/^https?:\/\//.test(it.url)?it.url:"https://news.ycombinator.com/item?id="+it.id;
+        a.target="_blank";a.rel="noopener";a.textContent=it.title;a.style.color="var(--ink)";a.style.textDecoration="none";
+        li.appendChild(a);li.appendChild(document.createTextNode(" · ▲ "+(it.score||0)));ul.appendChild(li);
+      });
+      stamp("hnUp");
+      if(items[0])live.hn=["Tech",items[0].title];
+      renderTicker();
+    }).catch(function(){txt("hnHead","Live tech stories are not reachable right now.");});
+  }
+  if(window.fetch&&window.AbortController){
+    loadWeather();loadQuakes();loadHN();
+    setInterval(loadWeather,600000);setInterval(loadQuakes,300000);setInterval(loadHN,600000);
+  }else{txt("wxDesc","Live data needs a newer browser.");txt("eqHead","Live data needs a newer browser.");txt("hnHead","Live data needs a newer browser.");}
+
+  /* ---------- small interactions ---------- */
+  if(matchMedia("(hover:hover)").matches&&!reduce){
+    document.querySelectorAll(".glass").forEach(function(el){
+      el.addEventListener("pointermove",function(e){
+        var r=el.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
+        el.style.setProperty("--ry",(x*8).toFixed(2)+"deg");el.style.setProperty("--rx",(-y*8).toFixed(2)+"deg");
+      });
+      el.addEventListener("pointerleave",function(){el.style.setProperty("--ry","0deg");el.style.setProperty("--rx","0deg");});
+    });
+  }
+  var cb=$("copyMail");
+  if(cb)cb.addEventListener("click",function(){
+    var t=$("mailTxt").textContent;
+    function done(){cb.textContent="Copied";setTimeout(function(){cb.textContent="Copy email";},1600);}
+    function sel(){var r=document.createRange();r.selectNodeContents($("mailTxt"));var s=getSelection();s.removeAllRanges();s.addRange(r);cb.textContent="Press Ctrl+C";}
+    try{navigator.clipboard.writeText(t).then(done,sel);}catch(e){sel();}
+  });
+
+  /* ---------- active section: nav highlight and theme colours ---------- */
+  var links=[].slice.call(document.querySelectorAll("#pill a"));
+  var secs=[].slice.call(document.querySelectorAll(".scene"));
+  function setTheme(sec){
+    var cs=getComputedStyle(sec);
+    root.style.setProperty("--ga",cs.getPropertyValue("--a").trim());
+    root.style.setProperty("--gb",cs.getPropertyValue("--b").trim());
+  }
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){if(e.isIntersecting){
+      links.forEach(function(a){a.classList.toggle("on",a.getAttribute("href")==="#"+e.target.id);});
+      setTheme(e.target);
+      var on=document.querySelector("#pill a.on");
+      if(on){try{on.parentNode.scrollTo({left:on.offsetLeft-40,behavior:"smooth"});}catch(_){}}
+    }});
+  },{rootMargin:"-45% 0px -50% 0px"});
+  secs.forEach(function(s){io.observe(s);});
+  setTheme(secs[0]);
+
+  var progEl=$("prog");
+  function progress(){var m=Math.max(1,document.documentElement.scrollHeight-innerHeight);progEl.style.transform="scaleX("+Math.min(1,scrollY/m).toFixed(4)+")";}
+  if(typeof THREE==="undefined"){addEventListener("scroll",progress,{passive:true});return;}
+
+  /* ---------- WebGL particle field, coloured by the active section ---------- */
+  var canvas=$("gl"),renderer;
+  try{renderer=new THREE.WebGLRenderer({canvas:canvas,alpha:true,antialias:false});}catch(e){addEventListener("scroll",progress,{passive:true});return;}
+  var dpr=Math.min(devicePixelRatio||1,2);
+  renderer.setPixelRatio(dpr);
+  var scene=new THREE.Scene();
+  var camera=new THREE.PerspectiveCamera(45,1,.1,80);camera.position.z=6;
+
+  var N=wide()?42000:20000,TAU=Math.PI*2,R=Math.random;
+  var g=function(){return(R()+R()+R()-1.5)/1.5;};
+  function rx(p,a){var c=Math.cos(a),s=Math.sin(a);return[p[0],p[1]*c-p[2]*s,p[1]*s+p[2]*c];}
+  function ry(p,a){var c=Math.cos(a),s=Math.sin(a);return[p[0]*c+p[2]*s,p[1],-p[0]*s+p[2]*c];}
+  function rz(p,a){var c=Math.cos(a),s=Math.sin(a);return[p[0]*c-p[1]*s,p[0]*s+p[1]*c,p[2]];}
+  function gen(fn){var a=new Float32Array(N*3);for(var i=0;i<N;i++){var p=fn(i);a[i*3]=p[0];a[i*3+1]=p[1];a[i*3+2]=p[2];}return a;}
+  function sph(r){var u=R()*2-1,t=R()*TAU,s=Math.sqrt(1-u*u);return[r*s*Math.cos(t),r*u,r*s*Math.sin(t)];}
+
+  var shapes=[
+    /* 0 ring: glowing portal */
+    gen(function(i){
+      var f=i/N;
+      if(f<.72){var u=R()*TAU,v=R()*TAU,r=.13+.06*R(),Rr=1.55;return rx([(Rr+r*Math.cos(v))*Math.cos(u),(Rr+r*Math.cos(v))*Math.sin(u),r*Math.sin(v)],1.0);}
+      if(f<.92){var a=R()*TAU,d=Math.sqrt(R())*1.4;return rx([d*Math.cos(a),d*Math.sin(a),g()*.05],1.0);}
+      return rx(sph(.28*Math.pow(R(),.5)),1.0);
+    }),
+    /* 1 torus knot: intelligence */
+    gen(function(){
+      var u=R()*TAU,k=.52,x=(2+Math.cos(3*u))*Math.cos(2*u),y=(2+Math.cos(3*u))*Math.sin(2*u),z=Math.sin(3*u);
+      return rx([x*k+g()*.07,y*k+g()*.07,z*k*1.3+g()*.07],.5);
+    }),
+    /* 2 globe with meridians: the world */
+    gen(function(i){
+      var f=i/N,r=1.55;
+      if(f<.4)return rz(sph(r),.4);
+      if(f<.7){var lat=(Math.floor(R()*11)-5)*Math.PI/12,lon=R()*TAU;return rz([r*Math.cos(lat)*Math.cos(lon),r*Math.sin(lat),r*Math.cos(lat)*Math.sin(lon)],.4);}
+      if(f<.95){var lo=Math.floor(R()*12)*TAU/12,la=(R()-.5)*Math.PI;return rz([r*Math.cos(la)*Math.cos(lo),r*Math.sin(la),r*Math.cos(la)*Math.sin(lo)],.4);}
+      return sph(r*1.35+R()*.5);
+    }),
+    /* 3 rolling field with a sun: farming */
+    gen(function(i){
+      if(i/N>.95){var s=sph(.3);return[1.9+s[0],1.2+s[1],-.5+s[2]];}
+      var x=(R()*2-1)*3.1,z=(R()*2-1)*1.9;
+      if(R()<.55)z=Math.round(z*7)/7+g()*.02;
+      var y=-.6+.32*Math.sin(x*1.3+z*1.1)+.18*Math.sin(z*2.3-x*.7);
+      if(R()<.2)y+=R()*.4;
+      return rx([x,y,z],.42);
+    }),
+    /* 4 three book panels */
+    gen(function(i){
+      var k=i%3,w=1.15,h=1.6,u,v;
+      if(R()<.3){var e=R()*4;if(e<1){u=e-.5;v=-.5;}else if(e<2){u=.5;v=e-1.5;}else if(e<3){u=e-2.5;v=.5;}else{u=-.5;v=e-3.5;}}
+      else{u=R()-.5;v=R()-.5;}
+      var p=[u*w,v*h,g()*.03],cfg=[[-1.55,0,-.5,.45],[0,.1,.35,0],[1.55,-.1,-.5,-.45]][k];
+      p=ry(p,cfg[3]);return[p[0]+cfg[0],p[1]+cfg[1],p[2]+cfg[2]];
+    }),
+    /* 5 spiral galaxy */
+    gen(function(){
+      var arm=Math.floor(R()*3),r=Math.pow(R(),.6)*2.7,a=r*1.5+arm*TAU/3+g()*.28*(1+r*.3);
+      return rx([r*Math.cos(a),g()*.14*(1.2-r/3.2),r*Math.sin(a)],.9);
+    }),
+    /* 6 DNA helix: journey */
+    gen(function(i){
+      var f=i/N;
+      if(f<.8){var y=(R()*2-1)*2.3,s=(i%2)*Math.PI,a=y*2.6+s;return ry([Math.cos(a)*.85+g()*.05,y,Math.sin(a)*.85+g()*.05],.3);}
+      var y2=(Math.floor(R()*26)/25*2-1)*2.3,a2=y2*2.6,t=R()*2-1;
+      return ry([Math.cos(a2)*.85*t,y2,Math.sin(a2)*.85*t],.3);
+    }),
+    /* 7 open cloud: the wider universe */
+    gen(function(){var s=sph(2.2+R()*2.6);s[1]*=.7;return s;})
+  ];
+  var NS=shapes.length;
+
+  var geo=new THREE.BufferGeometry();
+  geo.setAttribute("position",new THREE.BufferAttribute(shapes[0],3));
+  for(var k=0;k<NS;k++)geo.setAttribute("s"+k,new THREE.BufferAttribute(shapes[k],3));
+  var aR=new Float32Array(N*4);
+  for(var i=0;i<N;i++){aR[i*4]=R();aR[i*4+1]=R();aR[i*4+2]=.6+R()*1.5+(R()<.02?2:0);aR[i*4+3]=R();}
+  geo.setAttribute("aR",new THREE.BufferAttribute(aR,4));
+
+  var uni={uP:{value:0},uTime:{value:0},uIntro:{value:reduce?1:0},uShift:{value:0},uPx:{value:1},uM:{value:new THREE.Vector2(9,9)},uRot:{value:new THREE.Vector2(0,0)},uDim:{value:1},
+    uC1:{value:new THREE.Vector3(.38,.85,1)},uC2:{value:new THREE.Vector3(.55,.42,1)},uC3:{value:new THREE.Vector3(1,.31,.64)}};
+  var attrs="";for(k=0;k<NS;k++)attrs+="attribute vec3 s"+k+";\n";
+  var pick="";for(k=0;k<NS;k++)pick+=(k?"+":"")+"s"+k+"*w("+k+".0,q)";
+  var mat=new THREE.ShaderMaterial({
+    uniforms:uni,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,
+    vertexShader:attrs+
+    "attribute vec4 aR;uniform float uP,uTime,uIntro,uShift,uPx,uDim;uniform vec2 uM,uRot;uniform vec3 uC1,uC2,uC3;varying vec3 vC;varying float vA;\n"+
+    "float w(float k,float q){return clamp(1.-abs(q-k),0.,1.);}\n"+
+    "void main(){\n"+
+    " float fl=floor(uP),fr=uP-fl;\n"+
+    " float e=smoothstep(aR.x*.5,aR.x*.5+.5,fr);\n"+
+    " float q=fl+e;\n"+
+    " vec3 p="+pick+";\n"+
+    " vec3 dir=vec3(sin(aR.y*40.),cos(aR.x*37.),sin(aR.y*23.+aR.x*11.));\n"+
+    " p+=dir*1.3*sin(e*3.14159)*step(.001,fr)*step(fr,.999);\n"+
+    " p+=.035*vec3(sin(uTime*.6+aR.y*30.),cos(uTime*.5+aR.x*25.),sin(uTime*.4+aR.x*9.));\n"+
+    " float ie=smoothstep(aR.y*.6,aR.y*.6+.4,uIntro);\n"+
+    " p=mix(dir*6.,p,ie*ie*(3.-2.*ie));\n"+
+    " float ca=cos(uTime*.07+uRot.x),sa=sin(uTime*.07+uRot.x);\n"+
+    " p=vec3(p.x*ca+p.z*sa,p.y,-p.x*sa+p.z*ca);\n"+
+    " float cb=cos(uRot.y),sb=sin(uRot.y);p=vec3(p.x,p.y*cb-p.z*sb,p.y*sb+p.z*cb);\n"+
+    " p.x+=uShift;\n"+
+    " vec2 dm=p.xy-uM;float dl=length(dm)+.001;p.xy+=dm/dl*smoothstep(1.2,0.,dl)*.55;\n"+
+    " vec4 mv=modelViewMatrix*vec4(p,1.);\n"+
+    " gl_Position=projectionMatrix*mv;\n"+
+    " gl_PointSize=aR.z*uPx*(6./-mv.z);\n"+
+    " vec3 c=mix(uC1,uC2,smoothstep(.0,.6,aR.w));\n"+
+    " c=mix(c,uC3,smoothstep(.55,.9,aR.w));\n"+
+    " c=mix(c,vec3(1.,.9,.7),step(.965,aR.w));\n"+
+    " vC=c;vA=uDim*(.35+.65*aR.y);\n"+
+    "}",
+    fragmentShader:"varying vec3 vC;varying float vA;void main(){float d=length(gl_PointCoord-.5);float a=smoothstep(.5,.05,d);gl_FragColor=vec4(vC*1.1,a*vA*.8);}"
+  });
+  scene.add(new THREE.Points(geo,mat));
+
+  /* distant stars: give the pull-back real depth */
+  var NSt=wide()?2600:1200,sp=new Float32Array(NSt*3);
+  for(var si=0;si<NSt;si++){var sv=sph(12+R()*30);sp[si*3]=sv[0];sp[si*3+1]=sv[1];sp[si*3+2]=sv[2];}
+  var sgeo=new THREE.BufferGeometry();sgeo.setAttribute("position",new THREE.BufferAttribute(sp,3));
+  var stars=new THREE.Points(sgeo,new THREE.PointsMaterial({size:1.5*dpr,sizeAttenuation:false,color:0xa9bcff,transparent:true,opacity:.65,depthWrite:false}));
+  scene.add(stars);
+
+  function hex2rgb(h){h=(h||"").trim().replace("#","");if(h.length===3)h=h.replace(/./g,"$&$&");var n=parseInt(h,16);if(isNaN(n))return[.4,.85,1];return[(n>>16&255)/255,(n>>8&255)/255,(n&255)/255];}
+  var secCols=[];
+  function readThemes(){secCols=secs.map(function(s){var cs=getComputedStyle(s);return[hex2rgb(cs.getPropertyValue("--a")),hex2rgb(cs.getPropertyValue("--b")),hex2rgb(cs.getPropertyValue("--c"))];});}
+
+  var tops=[],cur={p:0,s:0,z:6,col:[.38,.85,1,.55,.42,1,1,.31,.64]},tgt={p:0,s:0,z:6,col:[.38,.85,1,.55,.42,1,1,.31,.64]},mouse={x:0,y:0},sm={x:0,y:0},halfH,halfW;
+  function ss(a,b,x){x=Math.max(0,Math.min(1,(x-a)/(b-a)));return x*x*(3-2*x);}
+  function measure(){
+    var w=innerWidth,h=innerHeight;
+    renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
+    halfH=6*Math.tan(22.5*Math.PI/180);halfW=halfH*(w/h);
+    uni.uPx.value=dpr*Math.max(.7,Math.min(1.5,h/800))*1.5*(wide()?1:1.1);
+    uni.uDim.value=wide()?1:.55;
+    tops=secs.map(function(s){return s.getBoundingClientRect().top+scrollY;});
+    readThemes();
+  }
+  function readScroll(){
+    var y=scrollY+innerHeight*.5,i=0;
+    for(var j=0;j<tops.length;j++){if(y>=tops[j])i=j;}
+    var nxt=Math.min(i+1,secs.length-1),span=(tops[nxt]-tops[i])||1,f=Math.max(0,Math.min(1,(y-tops[i])/span));
+    var e=ss(.3,.7,f),a=secs[i],b=secs[nxt];
+    var pa=+a.dataset.shape,pb=+b.dataset.shape,sa=wide()?+a.dataset.shift:0,sb=wide()?+b.dataset.shift:0;
+    tgt.p=pa+(pb-pa)*e;tgt.s=(sa+(sb-sa)*e)*Math.min(2.1,halfW*.52);
+    var za=+a.dataset.zoom||6,zb=+b.dataset.zoom||6;tgt.z=za+(zb-za)*e;
+    var ca=secCols[i],cb2=secCols[nxt];
+    if(ca&&cb2)for(var q=0;q<3;q++)for(var c=0;c<3;c++)tgt.col[q*3+c]=ca[q][c]+(cb2[q][c]-ca[q][c])*e;
+    progress();
+  }
+  addEventListener("resize",function(){measure();readScroll();});
+  addEventListener("scroll",readScroll,{passive:true});
+  addEventListener("pointermove",function(e){mouse.x=e.clientX/innerWidth*2-1;mouse.y=e.clientY/innerHeight*2-1;},{passive:true});
+  addEventListener("load",function(){measure();readScroll();});
+  measure();readScroll();cur.p=tgt.p;cur.s=tgt.s;cur.z=tgt.z;for(var ci=0;ci<9;ci++)cur.col[ci]=tgt.col[ci];
+
+  var last=performance.now();
+  function frame(now){
+    requestAnimationFrame(frame);
+    if(document.hidden)return;
+    var t=Math.max(0,(now-introStart)/1000),dt=Math.min(.05,(now-last)/1000);last=now;
+    var ie=1,kk=1;
+    if(reduce){cur.p=tgt.p;cur.s=tgt.s;cur.z=tgt.z;}
+    else{var k1=1-Math.pow(.001,dt);kk=Math.min(1,k1*3.2);cur.p+=(tgt.p-cur.p)*kk;cur.s+=(tgt.s-cur.s)*kk;cur.z+=(tgt.z-cur.z)*Math.min(1,k1*1.6);
+      uni.uIntro.value=Math.min(1,t/3.6);uni.uTime.value=t;ie=Math.min(1,t/5);}
+    for(var m=0;m<9;m++)cur.col[m]+=(tgt.col[m]-cur.col[m])*(reduce?1:Math.min(1,kk*.6));
+    uni.uC1.value.set(cur.col[0],cur.col[1],cur.col[2]);uni.uC2.value.set(cur.col[3],cur.col[4],cur.col[5]);uni.uC3.value.set(cur.col[6],cur.col[7],cur.col[8]);
+    /* opening: dolly back out of the portal while the field of view relaxes */
+    var ez=1-Math.pow(1-ie,3);
+    camera.position.z=cur.z*(.22+.78*ez);
+    var fov=45+(1-ez)*32;if(Math.abs(camera.fov-fov)>.01){camera.fov=fov;camera.updateProjectionMatrix();}
+    sm.x+=(mouse.x-sm.x)*.06;sm.y+=(mouse.y-sm.y)*.06;
+    stars.rotation.y=scrollY*.00035+(reduce?0:t*.004);stars.rotation.x=sm.y*.05;
+    var hh=camera.position.z*Math.tan(camera.fov*Math.PI/360),hw=hh*camera.aspect;
+    uni.uP.value=Math.max(0,Math.min(NS-1,cur.p));uni.uShift.value=cur.s;
+    uni.uRot.value.set(reduce?0:sm.x*.35,reduce?0:sm.y*.2);
+    uni.uM.value.set(reduce||ie<1?9:sm.x*hw,reduce||ie<1?9:-sm.y*hh);
+    renderer.render(scene,camera);
+  }
+  requestAnimationFrame(frame);
+})();
+
+;(function(){
+  var $=function(i){return document.getElementById(i);};
+  var jv=$("jv");if(!jv)return;
+  var log=$("jvLog"),st=$("jvStatus"),inp=$("jvIn"),KEY="abxJk",MODEL="gemini-3.5-flash",hist=[],busy=false,rec=null,speaking=false;
+  var SYS="You are Jarvis, the voice AI assistant of ABHYNEX, the personal digital universe of Abhishek Sanjay Chendake (author, AI creator and engineering student from Mulegaon, Solapur, Maharashtra). ABHYNEX brands: Abhi AI, Astra Nexus AI, ABHYNEX Search, ABHYNEX 24 Hours, and Chendake Farmers BDL (modern farming guidance). Abhishek's books: The Ocean of Thoughts, The Search for the Unknown, The Better Version of You. Reply in the same language the user writes or speaks (Marathi, Hindi or English). Keep answers short, warm and clear, suitable to be read aloud, with no markdown symbols. If you do not know something, say so.";
+  function key(){try{return localStorage.getItem(KEY)||"";}catch(e){return "";}}
+  function state(s,t){jv.setAttribute("data-state",s);st.textContent=t||s.toUpperCase();}
+  function add(cls,text){var p=document.createElement("p");p.className="jv-m "+cls;p.textContent=text;log.appendChild(p);log.scrollTop=log.scrollHeight;return p;}
+  $("jvKeyBtn").addEventListener("click",function(){var k=$("jvKey");k.hidden=!k.hidden;});
+  $("jvKeySave").addEventListener("click",function(){var v=$("jvKeyIn").value.trim();if(!v)return;try{localStorage.setItem(KEY,v);}catch(e){}$("jvKeyIn").value="";$("jvKey").hidden=true;add("bot","Key saved. आता मला काहीही विचारा.");});
+  $("jvKeyClear").addEventListener("click",function(){try{localStorage.removeItem(KEY);}catch(e){}$("jvKeyIn").value="";add("bot","Key काढून टाकली.");});
+  function say(text){
+    if(!$("jvSpeak").checked||!window.speechSynthesis){state("idle","READY");return;}
+    try{
+      speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(text.replace(/[*_#`]/g,""));u.lang=$("jvLang").value;
+      var vs=speechSynthesis.getVoices(),l=u.lang.slice(0,2),v=vs.filter(function(x){return x.lang.slice(0,2)===l;})[0];if(v)u.voice=v;
+      u.onstart=function(){state("speaking","SPEAKING");};u.onend=u.onerror=function(){state("idle","READY");};
+      speechSynthesis.speak(u);
+    }catch(e){state("idle","READY");}
+  }
+  function send(text){
+    text=(text||"").trim();if(!text||busy)return;
+    add("me",text);inp.value="";
+    var k=key();
+    if(!k){add("err","आधी Gemini key save करा (खाली 'Gemini key' दाबा).");$("jvKey").hidden=false;return;}
+    busy=true;state("thinking","THINKING");
+    hist.push({role:"user",parts:[{text:text}]});if(hist.length>14)hist=hist.slice(-14);
+    var ctl=new AbortController(),to=setTimeout(function(){ctl.abort();},25000);
+    fetch("https://generativelanguage.googleapis.com/v1beta/models/"+MODEL+":generateContent",{method:"POST",signal:ctl.signal,headers:{"Content-Type":"application/json","x-goog-api-key":k},
+      body:JSON.stringify({systemInstruction:{parts:[{text:SYS}]},contents:hist})})
+    .then(function(r){return r.json().then(function(j){return {ok:r.ok,j:j};});})
+    .then(function(o){
+      clearTimeout(to);busy=false;
+      if(!o.ok){var m=(o.j&&o.j.error&&o.j.error.message)||"Request failed";hist.pop();add("err","Gemini error: "+m);state("idle","READY");return;}
+      var c=o.j.candidates&&o.j.candidates[0],t=c&&c.content&&c.content.parts?c.content.parts.map(function(p){return p.text||"";}).join(""):"";
+      if(!t){hist.pop();add("err","उत्तर मिळालं नाही, पुन्हा प्रयत्न करा.");state("idle","READY");return;}
+      hist.push({role:"model",parts:[{text:t}]});add("bot",t);say(t);
+    })
+    .catch(function(){clearTimeout(to);busy=false;hist.pop();add("err","Connect होऊ शकलं नाही. Internet तपासा (किंवा हे preview मध्ये block असू शकतं; तुमच्या स्वतःच्या site वर चालेल).");state("idle","READY");});
+  }
+  $("jvSend").addEventListener("click",function(){send(inp.value);});
+  inp.addEventListener("keydown",function(e){if(e.key==="Enter")send(inp.value);});
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  $("jvMic").addEventListener("click",function(){
+    if(!SR){add("err","या browser मध्ये voice input नाही. Chrome वापरा किंवा लिहून विचारा.");return;}
+    if(rec){try{rec.stop();}catch(e){}return;}
+    try{speechSynthesis.cancel();}catch(e){}
+    rec=new SR();rec.lang=$("jvLang").value;rec.interimResults=false;rec.maxAlternatives=1;
+    rec.onstart=function(){state("listening","LISTENING");};
+    rec.onresult=function(e){var t=e.results[0][0].transcript;send(t);};
+    rec.onerror=function(e){add("err","Mic error: "+(e.error||"unknown")+(e.error==="not-allowed"?" (mic permission द्या)":""));};
+    rec.onend=function(){rec=null;if(!busy)state("idle","READY");};
+    try{rec.start();}catch(e){rec=null;}
+  });
+})();
+</script>
+</body>
+</html>
